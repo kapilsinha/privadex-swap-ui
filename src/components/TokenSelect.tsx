@@ -1,16 +1,18 @@
 import {Button, Box, Image, useDisclosure} from "@chakra-ui/react";
 import {ChevronDownIcon} from "@chakra-ui/icons";
-import etherLogo from "../assets/etherLogo.png";
+import { Token } from "../data_models/Token";
+
 type Props = {
   openTokenModal: any;
-  value: any;
-  image: string;
-  button: string;
+  token: Token | null;
+  // image: string;
+  setActivatedButton: any;
+  disabled: boolean;
 };
 
-export default function TokenSelect({ openTokenModal, value, image, button }: Props) {
+export default function TokenSelect({ openTokenModal, token, /*image,*/ setActivatedButton, disabled } : Props) {
 
-  return value !== undefined ? (
+  return token !== null ? (
     <Button
       bg="white"
       borderRadius="1.12rem"
@@ -19,17 +21,18 @@ export default function TokenSelect({ openTokenModal, value, image, button }: Pr
       mr="0.5rem"
       color="black"
       onClick={() => {
-        console.log(button)
-        window.__button = button;
+        setActivatedButton();
         openTokenModal();}}
       _hover={{ bg: "rgb(119,204,255)" }}
-      rightIcon={<ChevronDownIcon fontSize="1.37rem" cursor="pointer" />}>
-      <Image boxSize="1.5rem"
+      rightIcon={<ChevronDownIcon fontSize="1.37rem" cursor="pointer" />}
+      disabled={disabled}
+      >
+      {/* <Image boxSize="1.5rem"
              src={image}
              alt="Logo"
              mr="0.5rem"
-      />
-      {value}
+      /> */}
+      {token!.symbol}
     </Button>
   ) : (
     <Button
@@ -38,10 +41,12 @@ export default function TokenSelect({ openTokenModal, value, image, button }: Pr
       p="0rem 1rem"
       borderRadius="1.12rem"
       onClick={() => {
-        console.log(button)
-        window.__button = button;
+        setActivatedButton();
         openTokenModal();}}
       _hover={{ bg: "rgb(119,204,255)" }}
-      rightIcon={<ChevronDownIcon fontSize="1.37rem" cursor="pointer" />}>Select a token</Button>
+      rightIcon={<ChevronDownIcon fontSize="1.37rem" cursor="pointer" />}
+      disabled={disabled}>
+        Select a token
+    </Button>
   );
 }

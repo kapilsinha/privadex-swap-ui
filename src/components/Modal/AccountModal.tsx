@@ -111,7 +111,7 @@ export default function AccountModal({ isOpen, onClose }: Props) {
                 <CopyIcon mr={1} />
                 Copy Address
               </Button>
-              <Link
+              {/* <Link
                 fontSize="0.825rem;"
                 d="flex"
                 alignItems="center"
@@ -125,12 +125,12 @@ export default function AccountModal({ isOpen, onClose }: Props) {
                 }}>
                 <ExternalLinkIcon mr={1} />
                 View on Explorer
-              </Link>
+              </Link> */}
             </Flex>
           </Box>
         </ModalBody>
 
-        <ModalFooter
+        {/* <ModalFooter
           justifyContent="flex-start"
           background="rgb(237, 238, 242)"
           borderBottomLeftRadius="3xl"
@@ -144,7 +144,7 @@ export default function AccountModal({ isOpen, onClose }: Props) {
           >
             Your transactions willl appear here...
           </Text>
-        </ModalFooter>
+        </ModalFooter> */}
       </ModalContent>
     </Modal>
   );

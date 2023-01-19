@@ -12,26 +12,33 @@ import {
   ModalCloseButton,
   Text, Input,
 } from "@chakra-ui/react";
-import Axios from "axios";
-import { useEffect, useState } from "react";
+// Can use later to make the table pretty but requires more work
+// import ReactTable from "react-table";
+import { useEffect, useState, Fragment } from "react";
+import { Token } from '../../data_models/Token';
+import token_list from './token_list.json';
+
 
 type Props = {
   isOpen: any;
   onClose: any;
+  selectedChain: string;
+  selectedToken: Token | null;
+  otherToken: Token | null;
+  setSelectedToken: any;
 };
 
-export default function TokenModal({isOpen, onClose}: Props) {
+export default function TokenModal({isOpen, onClose, selectedChain, selectedToken, otherToken, setSelectedToken}: Props) {
+  const crypto = token_list.map(x => Token.fromJSON(x));
+  // console.log(crypto);
   const [search, setSearch] = useState<any>("");
-  const [crypto, setCrypto] = useState<any[]>([]);
-  const [selected, setSelected] = useState<any>("");
+
+  // Used to reset the search text. Otherwise between close and open, the search
+  // text remains set (but is invisible)
+  // Can later dynamically pull tokens, but we do it statically for now
   useEffect(() => {
-    Axios.get(
-      `https://api.coinstats.app/public/v1/coins?skip=0&limit=100¤cy=INR`
-    ).then((res) => {
-      setCrypto(res.data.coins);
-    });
-  }, []);
-  console.log(crypto)
+    setSearch("");
+  }, [isOpen]);
   return (
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">
       <ModalOverlay />
@@ -61,7 +68,7 @@ export default function TokenModal({isOpen, onClose}: Props) {
             pb={2}
             mb={3}>
             <Input
-              placeholder="Search Token name"
+              placeholder="Search token name / symbol / address"
               fontSize="1.5rem"
               width="100%"
               size="19rem"
@@ -79,58 +86,58 @@ export default function TokenModal({isOpen, onClose}: Props) {
           {/*    <img src={imageToShow} alt="logo" width="50px" />*/}
           {/*    <span>{tokenNameToShow}</span>*/}
           {/*</Box>*/}
-
-          <div id="customers" className="App">
-            <table>
+          <div id="tokenlist" className="App">
+            <table style={{'height': '350px', 'overflow':'scroll', 'display': 'block'}}>
               <thead>
                 <tr>
                   <td>Name</td>
                   <td>Symbol</td>
+                  <td>Address</td>
                 </tr>
               </thead>
+              {/* <tbody> */}
               <tbody>
                 {crypto
-                  .filter((val) => {
-                    return val.name.toLowerCase().includes(search.toLowerCase());
+                  .filter((token) => {
+                    return token.symbol.toLowerCase().includes(search.toLowerCase()) ||
+                    token.name.toLowerCase().includes(search.toLowerCase()) ||
+                    token.getAddressFromEncodedTokenName().includes(search.toLowerCase());
                   })
-                  .map((val) => {
+                  .map((token, index) => {
                     let hidden = false;
-                    if ((window.__button === 'button2' && val.name === window.__selected)
-                      || (window.__button === 'button1' && val.name === window.__selected2)) {
+                    // Hide a token if it is selected on the other dropdown
+                    // TODO: revisit, should only kick in if they're the same chain
+                    let sameAsOtherToken = token.name === otherToken?.name && token.chain === otherToken?.chain;
+                    let wrongChain = token.chain !== selectedChain;
+                    if (sameAsOtherToken || wrongChain) {
                       hidden = true
                     }
-                    return (
-                      <>
-                        <tr id={val.name}
+                    // I altogether avoid creating the document elements so we can highlight alternating rows
+                    // and also it's wasteful to render but hide the objects
+                    return hidden === false && (
+                      <Fragment key={index}>
+                        <tr id={token.name} key={index}
                             style={{
-                              backgroundColor:window.__button === 'button2'
-                                ? (val.name === window.__selected2 ? "greenyellow" :"")
-                                : (val.name === window.__selected ? "greenyellow" :"")}}
+                              backgroundColor: (token.name === selectedToken?.name ? "rgb(208, 172, 235)" : "")
+                            }}
                             hidden={hidden}
                             onClick={function (e) {
-                              if (window.__button === 'button2') {
-                                window.__selected2 = val.name;
-                                window.__imageSelected2 = val.icon;
-                                window.__price2 = val.price;
-                              } else {
-                                window.__selected = val.name;
-                                window.__imageSelected = val.icon;
-                                window.__price1 = val.price
-                              }
-                              setSelected(val.name);
+                              // console.log('Set token');
+                              setSelectedToken(token);
                             }}>
                           <td className="logo">
-                              <a href={val.websiteUrl}>
-                                <img src={val.icon} alt="logo" width="30px" />
-                              </a>
-                              <span>{val.name}</span>
+                              {/* <a href={token.websiteUrl}>
+                                <img src={token.icon} alt="logo" width="30px" />
+                              </a> */}
+                              <span>{token.name}</span>
                           </td>
-                          <td className="symbol">{val.symbol}</td>
+                          <td className="symbol">{token.symbol}</td>
+                          <td className="address">{token.getTruncatedAddressFromEncodedTokenName()}</td>
                         </tr>
-                      </>
+                      </Fragment>
                     );
                   })
-                  .slice(0, 10)
+                  //.slice(0, 10)
                 }
               </tbody>
             </table>

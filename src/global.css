@@ -51,16 +51,16 @@ tbody > tr{
   text-align: center;
 }
 
-#customers td, #customers th {
+#tokenlist td, #tokenlist th {
   border: 1px solid #ddd;
   padding: 8px;
 }
 
-#customers tr:nth-child(even){background-color: #f2f2f2;}
+#tokenlist tr:nth-child(even){background-color: #dfdfdf;}
 
-#customers tr:hover {background-color: #ddd;}
+#tokenlist tr:hover {background-color: #acdfff;}
 
-#customers th {
+#tokenlist th {
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: center;

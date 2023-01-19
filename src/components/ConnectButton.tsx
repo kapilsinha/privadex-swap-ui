@@ -12,8 +12,8 @@ export default function ConnectButton({ handleOpenModal }: Props) {
   const etherBalance = useEtherBalance(account);
 
   function handleConnectWallet() {
-    console.log("activate browser wallet")
-    activateBrowserWallet();
+    // console.log("activate browser wallet")
+    activateBrowserWallet({ type: 'metamask' });
   }
 
   return account ? (
