@@ -168,7 +168,7 @@ export default function Trade() {
     <Box
       w="30.62rem"
       mx="auto"
-      mt="5.25rem"
+      mt="3.5rem"
       boxShadow="rgb(0 0 0 / 8%) 0rem 0.37rem 0.62rem"
       borderRadius="1.37rem"
     >
