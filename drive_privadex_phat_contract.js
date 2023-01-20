@@ -53,7 +53,7 @@ class PrivaDexAPI {
     const sudoAccount = "//Alice";
 
     const contractPrivadex = loadPrivadexContractFile(
-      "0x9e3740746869ef4435638e7d3963a35f556d980c5ecb717bf5b220bb9213f845"
+      "0xcd62e9590b807b11bfe8ba97937864f99974d23976d127b89550805ea3fa1df0"
     );
 
     // Connect to the chain
