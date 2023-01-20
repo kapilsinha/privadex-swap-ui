@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useFormspark } from "@formspark/use-formspark";
-import { Box, Button, CloseButton, Flex, Stack } from "@chakra-ui/react";
+import { Box, CloseButton, Stack } from "@chakra-ui/react";
+import { useEthers } from "@usedapp/core";
+
 
 export default function FeedbackForm() {
   const [submit, submitting] = useFormspark({
@@ -8,15 +10,20 @@ export default function FeedbackForm() {
   });
   const [message, setMessage] = useState("");
   const [hidden, setHidden] = useState(false);
+  const { account, chainId } = useEthers();
   return (
     <Box hidden={hidden}>
       <form
         onSubmit={async (e) => {
           e.preventDefault();
-          await submit({ message });
-          console.log('Feedback sent!')
-          setMessage("");
-          setHidden(true);
+          if (message !== "") {
+            let annotatedMsg = `${message} (from ${account} on chain ${chainId})`
+            await submit({ annotatedMsg });
+            // console.log(annotatedMsg);
+            console.log('Feedback sent!')
+            setMessage("");
+            setHidden(true);
+          }
         }}
       >
         <Stack alignItems="center">
@@ -32,7 +39,7 @@ export default function FeedbackForm() {
             rows={5}
             cols={30}
             placeholder={
-              "Or join our Discord channel and talk to us in real-time!"
+              "Or be an OG and join our Discord channel to talk to us in real-time!"
             }
           />
           <button type="submit" disabled={submitting}>

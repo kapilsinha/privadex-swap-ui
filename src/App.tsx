@@ -21,14 +21,19 @@ function App() {
       <Swap />
       <Flex alignItems="center" justifyContent="center" py="7">
         <SocialIcon
-          url="https://twitter.com/doprivadex"
-          style={{ left: "-1rem" }}
-        />
-        <SocialIcon url="https://www.youtube.com/@privadex" />
-        <SocialIcon
           url="https://discord.gg/dpPDNreeQ3"
-          style={{ left: "1rem" }}
+          style={{ left: "-1.5rem" }}
         />
+        <SocialIcon
+          url="https://twitter.com/doprivadex"
+          style={{ left: "-0.5rem" }}
+        />
+        <SocialIcon url="https://www.youtube.com/@privadex" 
+          style={{ left: "0.5rem" }}
+        />
+        <SocialIcon url="https://github.com/kapilsinha/privadex"
+          style={{ left: "1.5rem" }}
+          />
       </Flex>
       <Flex px="5" position={'absolute'} left='2rem' bottom='2rem'>
         <FeedbackForm />

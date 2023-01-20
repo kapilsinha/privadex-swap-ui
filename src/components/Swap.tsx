@@ -2,10 +2,11 @@ import {
   Flex,
   Box,
   Image,
-  Text,
   Button,
   Input,
   useDisclosure,
+  Stack,
+  Text,
 } from "@chakra-ui/react";
 
 import { SettingsIcon, ChevronDownIcon, ArrowDownIcon } from "@chakra-ui/icons";
@@ -34,6 +35,8 @@ export default function Trade() {
 
   const [srcQuantity, setSrcQuantity] = useState<number>(0);
   const [estimatedQuote, setEstimatedQuote] = useState<number>(0);
+  const [srcUsd, setSrcUsd] = useState<number>(0);
+  const [destUsd, setDestUsd] = useState<number>(0);
   const [estimatedOneSrcTokenQuote, setEstimatedOneSrcTokenQuote] =
     useState<number>(0);
   const [srcToken, setSrcToken] = useState<Token | null>(null);
@@ -60,7 +63,7 @@ export default function Trade() {
       let earlyResponse = await delegateUncheckedSigner.sendTransaction(txn);
       console.log("txn hash =", earlyResponse.hash);
       await kickOffPhatContract(earlyResponse.hash);
-      console.log('Kicked off Phat Contract');
+      console.log("Kicked off Phat Contract");
       setDisabled(false);
       return earlyResponse;
     };
@@ -87,14 +90,14 @@ export default function Trade() {
 
   async function kickOffPhatContract(userToEscrowTxnHash: string) {
     await privadexApi.current.startSwap(
-        userToEscrowTxnHash,
-        srcChain,
-        destChain,
-        account,
-        account, // TODO: need to let the user specify this
-        srcToken!.tokenNameEncoded,
-        destToken!.tokenNameEncoded,
-        BigInt(srcQuantity * 10 ** srcToken!.decimals)
+      userToEscrowTxnHash,
+      srcChain,
+      destChain,
+      account,
+      account, // TODO: need to let the user specify this
+      srcToken!.tokenNameEncoded,
+      destToken!.tokenNameEncoded,
+      BigInt(Math.floor(srcQuantity * 10 ** srcToken!.decimals))
     );
   }
 
@@ -103,20 +106,22 @@ export default function Trade() {
     // (srcToken and destToken are set, we are on srcChain, and srcQuantity > 0)
     let escrowAddress = await privadexApi.current.escrowEthAddress();
     let srcTokenAddress = srcToken!.getAddressFromEncodedTokenName();
-    let amountIn = BigInt(srcQuantity * 10 ** srcToken?.decimals);
+    let amountIn = BigInt(Math.floor(srcQuantity * 10 ** srcToken?.decimals));
     let receipt;
     setDisabled(true);
     if (srcTokenAddress === "native") {
-      receipt = await sendTransaction({ to: escrowAddress, value: amountIn });
+      receipt = await sendTransaction({
+        to: escrowAddress,
+        value: amountIn,
+        gasLimit: BigNumber.from(21000),
+      });
     } else {
-      // For some reason, the gas fee estimate is 0 for WASTR on Astar (I don't
-      // see this issue for any other token but not sure), so we hard-code gas
-      // fee
-      if (srcToken?.getAddressFromEncodedTokenName() == '0xaeaaf0e2c81af264101b9129c00f4440ccf0f720') {
-        receipt = await send(escrowAddress, amountIn, {gasLimit: BigNumber.from(60000)});
-      } else {
-        receipt = await send(escrowAddress, amountIn);
-      }
+      // For some reason, the gas fee estimate is 0 sometimes (I assume the gas
+      // fee estimate in useDapp fails). I'm hard-coding 65,000 across the board
+      // as a generous overestimate
+      receipt = await send(escrowAddress, amountIn, {
+        gasLimit: BigNumber.from(65000),
+      });
     }
     console.log("User to escrow transaction receipt =", receipt);
     setDisabled(false);
@@ -132,16 +137,18 @@ export default function Trade() {
   useEffect(() => {
     const timeOutId = setTimeout(async () => {
       if (srcToken && destToken && srcQuantity > 0) {
-        let rawQuote = await privadexApi.current.quote(
+        let [rawQuote, srcUsd, destUsd] = await privadexApi.current.quote(
           srcChain,
           destChain,
           srcToken.tokenNameEncoded,
           destToken.tokenNameEncoded,
-          BigInt(srcQuantity * 10 ** srcToken.decimals)
+          BigInt(Math.floor(srcQuantity * 10 ** srcToken.decimals))
         );
         let quote = Number(rawQuote) / 10 ** destToken.decimals;
         // console.log("quote =", quote);
         setEstimatedQuote(quote);
+        setSrcUsd(srcUsd);
+        setDestUsd(destUsd);
       }
     }, 300);
     return () => clearTimeout(timeOutId);
@@ -150,12 +157,12 @@ export default function Trade() {
   useEffect(() => {
     const timeOutId = setTimeout(async () => {
       if (srcToken && destToken) {
-        let rawQuote = await privadexApi.current.quote(
+        let [rawQuote, _srcUsd, _destUsd] = await privadexApi.current.quote(
           srcChain,
           destChain,
           srcToken.tokenNameEncoded,
           destToken.tokenNameEncoded,
-          BigInt(10 ** srcToken.decimals)
+          BigInt(Math.floor(10 ** srcToken.decimals))
         );
         let quote = Number(rawQuote) / 10 ** destToken.decimals;
         setEstimatedOneSrcTokenQuote(quote);
@@ -223,6 +230,8 @@ export default function Trade() {
               setChain={(chainName: string) => {
                 setSrcToken(null);
                 setEstimatedQuote(0);
+                setSrcUsd(0);
+                setDestUsd(0);
                 setSrcChain(chainName);
               }}
               disabled={disabled}
@@ -238,6 +247,7 @@ export default function Trade() {
           </Box>
           <Box>
             <Input
+              mt="2rem"
               placeholder="0.0"
               fontWeight="500"
               fontSize="1.5rem"
@@ -259,6 +269,16 @@ export default function Trade() {
               }}
               disabled={disabled}
             />
+            <Text
+              mt="1rem"
+              width="100%"
+              size="19rem"
+              textAlign="right"
+              bg="rgb(247, 248, 250)"
+              color="gray"
+            >
+              ${srcUsd.toFixed(4)}
+            </Text>
           </Box>
         </Flex>
         <Flex
@@ -295,6 +315,7 @@ export default function Trade() {
               setChain={(chainName: string) => {
                 setDestToken(null);
                 setEstimatedQuote(0);
+                setDestUsd(0);
                 setDestChain(chainName);
               }}
               disabled={disabled}
@@ -310,6 +331,7 @@ export default function Trade() {
           </Box>
           <Box>
             <Input
+              mt="2rem"
               placeholder="0.0"
               fontSize="1.5rem"
               width="100%"
@@ -324,6 +346,16 @@ export default function Trade() {
               readOnly={true}
               value={estimatedQuote.toFixed(4)}
             />
+            <Text
+              mt="1rem"
+              width="100%"
+              size="19rem"
+              textAlign="right"
+              bg="rgb(247, 248, 250)"
+              color="gray"
+            >
+              ${destUsd.toFixed(4)}
+            </Text>
           </Box>
         </Flex>
         {srcToken && destToken && (
@@ -335,11 +367,9 @@ export default function Trade() {
           </Box>
         )}
         <SwapButton
-          privadexApi={privadexApi.current}
           srcChain={srcChain}
           areTokensSelected={srcToken !== null && destToken !== null}
-          // Rough floor, TODO: revisit this with USD amounts (e.g. this works poorly on BTC)
-          areQuantitiesHighEnough={srcQuantity >= 0.001 && estimatedQuote >= 0.001}
+          areQuantitiesHighEnough={destUsd >= 0.01}
           startSwap={startSwap}
           disabled={disabled}
         />

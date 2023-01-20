@@ -303,7 +303,7 @@
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0x6a2d262d56735dba19dd70682b39f6be9a931d98",
-        "symbol": "USDC",
+        "symbol": "ceUSDC",
         "name": "USD Coin",
         "decimals": 6
     },
