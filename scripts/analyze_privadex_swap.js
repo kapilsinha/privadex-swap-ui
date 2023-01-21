@@ -53,7 +53,7 @@ class PrivaDexAPI {
     const sudoAccount = "//Alice";
 
     const contractPrivadex = loadPrivadexContractFile(
-      "0xcd62e9590b807b11bfe8ba97937864f99974d23976d127b89550805ea3fa1df0"
+      "0xefc4881781de25f25f7e6e4a8323ee778229b2921a826f3be281c8226a90173e"
     );
 
     // Connect to the chain
@@ -139,23 +139,10 @@ async function sleep(t) {
 
 async function main() {
   const privadexApi = await PrivaDexAPI.initialize();
-  // await privadexApi.execPlan('0x1667b2afde1175c380da1abb58e9bc8a');
-  while (true) {
-    try {
-      let execPlanIds = await privadexApi.execPlanIds();
-      if (execPlanIds !== undefined && execPlanIds.length > 0) {
-        const stepForwardPromises = execPlanIds.map((id) =>
-          privadexApi.execPlanStepForward(id)
-        );
-        const resolvedPromises = Promise.all(stepForwardPromises);
-        logger.info(resolvedPromises);
-      }
-      await sleep(5000);
-    } catch (err) {
-      logger.error(err, "Error. Retry in 5 seconds...");
-      await sleep(5000);
-    }
-  }
+  let execPlanUuid = process.argv[2];
+  let x = await privadexApi.execPlanIds();
+  console.log(x);
+  await privadexApi.execPlan(execPlanUuid);
 }
 
 main()

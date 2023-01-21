@@ -1,4 +1,4 @@
-import { ChakraProvider, Flex, useDisclosure } from "@chakra-ui/react";
+import { ChakraProvider, Flex, useDisclosure, VStack } from "@chakra-ui/react";
 import theme from "./theme";
 import Header from "./components/Header";
 import ConnectButton from "./components/ConnectButton";
@@ -18,26 +18,28 @@ function App() {
         <ConnectButton handleOpenModal={onOpen} />
         <AccountModal isOpen={isOpen} onClose={onClose} />
       </Header>
-      <Swap />
-      <Flex alignItems="center" justifyContent="center" py="7">
+      <VStack position={"absolute"} px="4.3rem">
         <SocialIcon
           url="https://discord.gg/dpPDNreeQ3"
-          style={{ left: "-1.5rem" }}
+          style={{ height: 35, width: 35, marginBottom: 10 }}
         />
         <SocialIcon
           url="https://twitter.com/doprivadex"
-          style={{ left: "-0.5rem" }}
+          style={{ height: 35, width: 35, marginBottom: 10 }}
         />
-        <SocialIcon url="https://www.youtube.com/@privadex" 
-          style={{ left: "0.5rem" }}
+        <SocialIcon
+          url="https://www.youtube.com/@privadex"
+          style={{ height: 35, width: 35, marginBottom: 10 }}
         />
-        <SocialIcon url="https://github.com/kapilsinha/privadex"
-          style={{ left: "1.5rem" }}
-          />
-      </Flex>
-      <Flex px="5" position={'absolute'} left='2rem' bottom='2rem'>
+        <SocialIcon
+          url="https://github.com/kapilsinha/privadex"
+          style={{ height: 35, width: 35, marginBottom: 10 }}
+        />
+      </VStack>
+      <Flex px="5" position={"absolute"} left="2rem" bottom="2rem">
         <FeedbackForm />
       </Flex>
+      <Swap />
     </ChakraProvider>
   );
 }

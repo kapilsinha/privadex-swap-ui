@@ -1,5 +1,6 @@
+import { useEffect, useRef } from "react";
 import { Button, Box, Text, Flex } from "@chakra-ui/react";
-import { useEthers, useEtherBalance } from "@usedapp/core";
+import { useEthers, useEtherBalance, Astar, Moonbeam } from "@usedapp/core";
 import { formatEther } from "@ethersproject/units";
 import Identicon from "./Identicon";
 
@@ -8,24 +9,26 @@ type Props = {
 };
 
 export default function ConnectButton({ handleOpenModal }: Props) {
-  const { activateBrowserWallet, account } = useEthers();
+  const { activateBrowserWallet, account, chainId } = useEthers();
   const etherBalance = useEtherBalance(account);
+  const nativeTokenName =
+    chainId === Moonbeam.chainId
+      ? "GLMR"
+      : chainId === Astar.chainId
+      ? "ASTR"
+      : "";
 
   function handleConnectWallet() {
     // console.log("activate browser wallet")
-    activateBrowserWallet({ type: 'metamask' });
+    activateBrowserWallet({ type: "metamask" });
   }
 
   return account ? (
-    <Flex
-      alignItems="center"
-      bg="rgb(247, 248, 250)"
-      borderRadius="xl"
-      py="0"
-    >
+    <Flex alignItems="center" bg="rgb(247, 248, 250)" borderRadius="xl" py="0" mx="1.5rem">
       <Box px="3">
         <Text color="black" fontSize="md">
-          {etherBalance && parseFloat(formatEther(etherBalance)).toFixed(0)} ETH
+          {etherBalance && parseFloat(formatEther(etherBalance)).toFixed(0)}{" "}
+          {nativeTokenName}
         </Text>
       </Box>
       <Button
