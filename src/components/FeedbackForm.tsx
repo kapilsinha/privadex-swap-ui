@@ -4,7 +4,11 @@ import { Box, CloseButton, Stack } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
 
 
-export default function FeedbackForm() {
+type Props = {
+  nrows: number;
+};
+
+export default function FeedbackForm({ nrows }: Props) {
   const [submit, submitting] = useFormspark({
     formId: "qzGbI7Jw",
   });
@@ -27,7 +31,7 @@ export default function FeedbackForm() {
         }}
       >
         <Stack alignItems="center">
-          <CloseButton onClick={() => setHidden(true)} position='absolute' left='.3rem' top='.3rem'/>
+          <CloseButton onClick={() => setHidden(true)} mr={'17rem'} mb={'-1rem'} />
           <label style={{ fontWeight: "900" }}>
             Suggestions? Feature requests?
             <br />
@@ -36,7 +40,7 @@ export default function FeedbackForm() {
           <textarea
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            rows={5}
+            rows={nrows}
             cols={30}
             placeholder={
               "Or be an OG and join our Discord channel to talk to us in real-time!"

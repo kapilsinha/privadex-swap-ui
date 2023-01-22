@@ -9,6 +9,7 @@ import {
   ModalCloseButton,
   Text,
   Input,
+  Link,
 } from "@chakra-ui/react";
 // Can use later to make the table pretty but requires more work
 // import ReactTable from "react-table";
@@ -36,6 +37,19 @@ export default function TokenModal({
   const crypto = token_list.map((x) => Token.fromJSON(x));
   // console.log(crypto);
   const [search, setSearch] = useState<any>("");
+
+
+  function getChainExplorerLink(token_addr: string) {
+    if (token_addr === "native") {
+      return "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+    }
+    if (selectedChain == "astar") {
+      return `https://blockscout.com/astar/address/${token_addr}`;
+    } else if (selectedChain == "moonbeam") {
+      return `https://moonscan.io/address/${token_addr}`;
+    }
+    return ""; // Should never reach here
+  }
 
   // Used to reset the search text. Otherwise between close and open, the search
   // text remains set (but is invisible)
@@ -132,6 +146,7 @@ export default function TokenModal({
                       if (sameAsOtherToken || wrongChain) {
                         hidden = true;
                       }
+                      let href = getChainExplorerLink(token.getAddressFromEncodedTokenName());
                       // I altogether avoid creating the document elements so we can highlight alternating rows
                       // and also it's wasteful to render but hide the objects
                       return (
@@ -149,8 +164,10 @@ export default function TokenModal({
                               }}
                               hidden={hidden}
                               onClick={function (e) {
-                                // console.log('Set token');
                                 setSelectedToken(token);
+                                if (!e.target.toString().includes('http')) {
+                                  setTimeout(onClose, 250);
+                                }
                               }}
                             >
                               <td className="logo">
@@ -161,21 +178,20 @@ export default function TokenModal({
                               </td>
                               <td className="symbol">{token.symbol}</td>
                               <td className="address">
-                                {token.getTruncatedAddressFromEncodedTokenName()}
+                                <Link href={href} isExternal>{token.getAddressFromEncodedTokenName()}</Link>
                               </td>
                             </tr>
                           </Fragment>
                         )
                       );
                     })
-                  //.slice(0, 10)
                 }
               </tbody>
             </table>
           </div>
         </ModalBody>
 
-        <ModalFooter
+        {/* <ModalFooter
           justifyContent="flex-start"
           background="rgb(237, 238, 242)"
           borderBottomLeftRadius="3xl"
@@ -185,7 +201,7 @@ export default function TokenModal({
           <Text color="black" fontWeight="medium" fontSize="md">
             Manage Token List
           </Text>
-        </ModalFooter>
+        </ModalFooter> */}
       </ModalContent>
     </Modal>
   );

@@ -23,6 +23,8 @@ import {
   TransactionOptions,
   useContractFunction,
   ERC20Interface,
+  useEtherBalance,
+  useTokenBalance,
 } from "@usedapp/core";
 import { useConfig } from "@usedapp/core";
 import { Contract } from "@ethersproject/contracts";
@@ -44,6 +46,27 @@ export default function Trade() {
   const [srcChain, setSrcChain] = useState<string>("moonbeam"); // arbitrarily selected one of the chains
   const [destChain, setDestChain] = useState<string>("astar");
   const [disabled, setDisabled] = useState<boolean>(false);
+
+  const isSrcTokenNative =
+    srcToken?.getAddressFromEncodedTokenName() === "native";
+  const etherBalance = useEtherBalance(account);
+  const srcErc20Balance: BigNumber | undefined = useTokenBalance(
+    isSrcTokenNative === false
+      ? srcToken?.getAddressFromEncodedTokenName()
+      : undefined,
+    account
+  );
+  const srcTokenBalance =
+    isSrcTokenNative === false
+      ? srcErc20Balance?.toBigInt()
+      : etherBalance?.toBigInt();
+  const readableTokenBalance = srcTokenBalance
+    ? Number(srcTokenBalance / BigInt(10 ** (srcToken?.decimals - 4))) / 10000
+    : 0;
+  const userHasSufficientBalance =
+    srcToken && srcTokenBalance
+      ? srcTokenBalance >= BigInt(Math.floor(srcQuantity * 10 ** srcToken.decimals))
+      : false;
 
   const activatedIsSrcTokenModal = useRef(true); // false means the Dest token's TokenModal is activated
   const privadexApi = useRef(new PrivaDexAPI(null, null));
@@ -176,6 +199,7 @@ export default function Trade() {
       w="30.62rem"
       mx="auto"
       mt="3.5rem"
+      mb="1.5rem"
       boxShadow="rgb(0 0 0 / 8%) 0rem 0.37rem 0.62rem"
       borderRadius="1.37rem"
     >
@@ -198,14 +222,14 @@ export default function Trade() {
 
       <Flex
         alignItems="center"
-        p="1rem 1.25rem 0.5rem"
+        p="1rem 1.25rem 0rem"
         bg="white"
         color="rgb(86, 90, 105)"
         justifyContent="space-between"
         borderRadius="1.37rem 1.37rem 0 0"
       >
         <Text color="black" fontWeight="500">
-          Swap
+          Swap from:
         </Text>
         {/* <SettingsIcon
           fontSize="1.25rem"
@@ -246,8 +270,19 @@ export default function Trade() {
             />
           </Box>
           <Box>
+          <Text
+              // mt="1rem"
+              width="100%"
+              size="5rem"
+              textAlign="right"
+              bg="rgb(247, 248, 250)"
+              color="gray"
+              fontSize='xs'
+            >
+              {srcTokenBalance !== undefined && `Balance: ${readableTokenBalance} ${srcToken?.symbol}`}
+            </Text>
             <Input
-              mt="2rem"
+              mt="1rem"
               placeholder="0.0"
               fontWeight="500"
               fontSize="1.5rem"
@@ -272,10 +307,10 @@ export default function Trade() {
             <Text
               mt="1rem"
               width="100%"
-              size="19rem"
               textAlign="right"
               bg="rgb(247, 248, 250)"
               color="gray"
+              fontSize='s'
             >
               ${srcUsd.toFixed(4)}
             </Text>
@@ -285,14 +320,25 @@ export default function Trade() {
           alignItems="center"
           justifyContent="center"
           // bg="white"
-          p="0.18rem"
+          p="0.4rem"
           borderRadius="0.75rem"
           pos="relative"
           top="0rem"
         >
+          <Text
+            color="black"
+            fontWeight="500"
+            position={"absolute"}
+            left={"0.77rem"}
+            top={"0.6rem"}
+          >
+            Swap to:
+          </Text>
           <ArrowDownIcon
             bg="rgb(247, 248, 250)"
             color="rgb(128,128,128)"
+            // position={"absolute"}
+            top={"0rem"}
             h="1.5rem"
             width="1.62rem"
             borderRadius="0.75rem"
@@ -349,10 +395,10 @@ export default function Trade() {
             <Text
               mt="1rem"
               width="100%"
-              size="19rem"
               textAlign="right"
               bg="rgb(247, 248, 250)"
               color="gray"
+              fontSize='s'
             >
               ${destUsd.toFixed(4)}
             </Text>
@@ -368,8 +414,10 @@ export default function Trade() {
         )}
         <SwapButton
           srcChain={srcChain}
+          srcToken={srcToken}
           areTokensSelected={srcToken !== null && destToken !== null}
-          areQuantitiesHighEnough={destUsd >= 0.10}
+          areQuantitiesHighEnough={destUsd >= 0.1}
+          userHasSufficientBalance={userHasSufficientBalance}
           startSwap={startSwap}
           disabled={disabled}
         />

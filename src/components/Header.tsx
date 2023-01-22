@@ -15,11 +15,9 @@ export default function Layout({ children }: Props) {
         justifyContent="space-between"
         // maxW="83.43rem"
         mx="1.5rem"
-        mt="1.5rem">
-        <Image
-          boxSize="8rem"
-          src={logo}
-          alt="PrivaDEX" />
+        mt="1.5rem"
+      >
+        <Image boxSize="8rem" src={logo} alt="PrivaDEX" />
         {children}
       </Flex>
     </Menu>

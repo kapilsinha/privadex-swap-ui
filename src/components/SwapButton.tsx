@@ -1,18 +1,23 @@
 import { Button, Box } from "@chakra-ui/react";
 import { Astar, Moonbeam, useConnector, useEthers } from "@usedapp/core";
+import { Token } from "../data_models/Token";
 
 type Props = {
   srcChain: string;
-  areQuantitiesHighEnough: boolean;
+  srcToken: Token | null;
   areTokensSelected: boolean;
+  areQuantitiesHighEnough: boolean;
+  userHasSufficientBalance: boolean;
   startSwap: any;
   disabled: boolean;
 };
 
 export default function SwapButton({
   srcChain,
+  srcToken,
   areTokensSelected,
   areQuantitiesHighEnough,
+  userHasSufficientBalance,
   startSwap,
   disabled,
 }: Props) {
@@ -28,7 +33,6 @@ export default function SwapButton({
     if (srcChain === "astar") {
       return chainId === Astar.chainId;
     }
-    // console.log('test', connector, srcChain, chainId);
     return false;
   }
 
@@ -41,47 +45,15 @@ export default function SwapButton({
     } else if (srcChain === "moonbeam") {
       await switchNetwork(Moonbeam.chainId);
     }
-    activateBrowserWallet({ type: "metamask" });
-    // console.log("switching network", connector, account, chainId, srcChain, error);
   }
 
   return account && isCorrectChainId ? (
-    areTokensSelected ? (
-      areQuantitiesHighEnough ? (
-        <Box mt="0.5rem">
-          <Button
-            onClick={() => {
-              startSwap();
-            }}
-            color="white"
-            bg="rgb(187,142,224)"
-            width="100%"
-            p="1.62rem"
-            borderRadius="1.25rem"
-            _hover={{ bg: "rgb(119,204,255)" }}
-            disabled={disabled}
-          >
-            Swap
-          </Button>
-        </Box>
-      ) : (
-        <Box mt="0.5rem">
-          <Button
-            color="white"
-            bg="rgb(187,142,224)"
-            width="100%"
-            p="1.62rem"
-            borderRadius="1.25rem"
-            _hover={{ bg: "rgb(119,204,255)" }}
-            disabled={disabled}
-          >
-            Insufficient amount
-          </Button>
-        </Box>
-      )
-    ) : (
+    areTokensSelected && areQuantitiesHighEnough && userHasSufficientBalance ? (
       <Box mt="0.5rem">
         <Button
+          onClick={() => {
+            startSwap();
+          }}
           color="white"
           bg="rgb(187,142,224)"
           width="100%"
@@ -90,7 +62,25 @@ export default function SwapButton({
           _hover={{ bg: "rgb(119,204,255)" }}
           disabled={disabled}
         >
-          Please select token
+          Swap
+        </Button>
+      </Box>
+    ) : (
+      <Box mt="0.5rem">
+        <Button
+          color="white"
+          bg="rgb(187,169,198)"
+          width="100%"
+          p="1.62rem"
+          borderRadius="1.25rem"
+          _hover={{ bg: "rgb(187,169,198)" }}
+          disabled={disabled}
+        >
+          {areTokensSelected
+            ? areQuantitiesHighEnough
+              ? `Insufficient ${srcToken?.symbol} balance`
+              : "Amount too low"
+            : "Please select a token"}
         </Button>
       </Box>
     )
@@ -106,7 +96,11 @@ export default function SwapButton({
         _hover={{ bg: "rgb(119,204,255)" }}
         disabled={disabled}
       >
-        Connect Wallet to {srcChain.charAt(0).toUpperCase() + srcChain.slice(1)}
+        {account === undefined
+          ? "Connect Wallet"
+          : `Switch network to ${srcChain
+              .charAt(0)
+              .toUpperCase()}${srcChain.slice(1)}`}
       </Button>
     </Box>
   );
