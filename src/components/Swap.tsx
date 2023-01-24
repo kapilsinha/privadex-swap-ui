@@ -7,6 +7,7 @@ import {
   useDisclosure,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 
 import { SettingsIcon, ChevronDownIcon, ArrowDownIcon } from "@chakra-ui/icons";
@@ -14,7 +15,10 @@ import SwapButton from "./SwapButton";
 import TokenSelect from "./TokenSelect";
 import TokenModal from "./Modal/TokenModal";
 import { useEffect, useState, useRef } from "react";
-import { PrivaDexAPI } from "../phat_api/privadex_phat_contract_api";
+import {
+  PrivaDexAPI,
+  SimpleSwapStatus,
+} from "../phat_api/privadex_phat_contract_api";
 import ChainSelect from "./ChainSelect";
 import { Token } from "../data_models/Token";
 import {
@@ -25,15 +29,31 @@ import {
   ERC20Interface,
   useEtherBalance,
   useTokenBalance,
+  Moonbeam,
+  Astar,
 } from "@usedapp/core";
 import { useConfig } from "@usedapp/core";
 import { Contract } from "@ethersproject/contracts";
 import { BigNumber } from "ethers";
 
+// Used to display to the user the status of their swap
+class SwapStatusDisplayManager {
+  timerId: number;
+  summaryStr: string;
+  numConfirmedSteps: number | null;
+
+  constructor(timerId: number, summaryStr: string) {
+    this.timerId = timerId;
+    this.summaryStr = summaryStr;
+    this.numConfirmedSteps = null;
+  }
+}
+
 export default function Trade() {
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const { account, chainId, library } = useEthers();
+  const { account, chainId } = useEthers();
   const config = useConfig();
+  const toast = useToast();
 
   const [srcQuantity, setSrcQuantity] = useState<number>(0);
   const [estimatedQuote, setEstimatedQuote] = useState<number>(0);
@@ -59,14 +79,24 @@ export default function Trade() {
   const srcTokenBalance =
     isSrcTokenNative === false
       ? srcErc20Balance?.toBigInt()
-      : etherBalance?.toBigInt();
+      : (chainId === Moonbeam.chainId && srcChain === "moonbeam") ||
+        (chainId === Astar.chainId && srcChain === "astar")
+      ? etherBalance?.toBigInt()
+      : undefined;
   const readableTokenBalance = srcTokenBalance
     ? Number(srcTokenBalance / BigInt(10 ** (srcToken?.decimals - 4))) / 10000
     : 0;
   const userHasSufficientBalance =
     srcToken && srcTokenBalance
-      ? srcTokenBalance >= BigInt(Math.floor(srcQuantity * 10 ** srcToken.decimals))
+      ? srcTokenBalance >=
+        BigInt(Math.floor(srcQuantity * 10 ** srcToken.decimals))
       : false;
+
+  // Used to update the user about the status of their swap. Should abstract into a different
+  // file or class later
+  var execPlanUuidToSwapStatusDisplayManager: {
+    [key: string]: SwapStatusDisplayManager;
+  } = {};
 
   const activatedIsSrcTokenModal = useRef(true); // false means the Dest token's TokenModal is activated
   const privadexApi = useRef(new PrivaDexAPI(null, null));
@@ -112,7 +142,7 @@ export default function Trade() {
   );
 
   async function kickOffPhatContract(userToEscrowTxnHash: string) {
-    await privadexApi.current.startSwap(
+    let execPlanUuid = await privadexApi.current.startSwap(
       userToEscrowTxnHash,
       srcChain,
       destChain,
@@ -122,6 +152,71 @@ export default function Trade() {
       destToken!.tokenNameEncoded,
       BigInt(Math.floor(srcQuantity * 10 ** srcToken!.decimals))
     );
+    let capSrcChain = srcChain.charAt(0).toUpperCase() + srcChain.slice(1);
+    let capDestChain = destChain.charAt(0).toUpperCase() + destChain.slice(1);
+    let summaryStr = `${srcToken!.symbol} (${capSrcChain}) -> ${
+      destToken!.symbol
+    } (${capDestChain}) swap`;
+    let timerId = setInterval(updateSwapStatus, 5000, execPlanUuid);
+    execPlanUuidToSwapStatusDisplayManager[execPlanUuid] =
+      new SwapStatusDisplayManager(timerId, summaryStr);
+  }
+
+  async function updateSwapStatus(execPlanUuid: string) {
+    let timerId = execPlanUuidToSwapStatusDisplayManager[execPlanUuid].timerId;
+    if (timerId !== null) {
+      let execPlanStatus = await privadexApi.current.getStatus(execPlanUuid);
+      if (
+        execPlanUuidToSwapStatusDisplayManager[execPlanUuid]
+          .numConfirmedSteps === execPlanStatus.numConfirmedSteps ||
+        execPlanStatus.simpleStatus === SimpleSwapStatus.Unknown
+      ) {
+        // Only toast on new meaningful state update
+        return;
+      }
+      execPlanUuidToSwapStatusDisplayManager[execPlanUuid].numConfirmedSteps =
+        execPlanStatus.numConfirmedSteps;
+      console.log("Swap status = ", execPlanStatus);
+      let execSummary =
+        execPlanUuidToSwapStatusDisplayManager[execPlanUuid].summaryStr;
+      if (execPlanStatus.simpleStatus === SimpleSwapStatus.Confirmed) {
+        toast({
+          title: "Swap completed!",
+          description: `Your ${execSummary} is confirmed.`,
+          status: "success",
+          duration: 16000,
+          isClosable: true,
+        });
+        clearInterval(timerId);
+        delete execPlanUuidToSwapStatusDisplayManager[execPlanUuid];
+      } else if (execPlanStatus.simpleStatus === SimpleSwapStatus.InProgress) {
+        let description =
+          execPlanStatus.numConfirmedSteps > 0
+            ? `${execPlanStatus.numConfirmedSteps} of ${execPlanStatus.totalSteps} ` +
+              `steps completed for your ${execSummary}.`
+            : `Your ${execSummary} has begun (${execPlanStatus.totalSteps} steps remaining)`;
+        toast({
+          title: "Swap in progress...",
+          description: description,
+          status: "info",
+          duration: 16000,
+          isClosable: true,
+        });
+      } else if (execPlanStatus.simpleStatus === SimpleSwapStatus.Failed) {
+        toast({
+          title: "Swap failed :(",
+          description:
+            `Your ${execSummary} failed due to high slippage. ` +
+            "Please contact us (via Discord or the feedback form) and copy-paste the following ID: " +
+            `${execPlanUuid}. We will revert your funds back to you.`,
+          status: "error",
+          duration: null,
+          isClosable: true,
+        });
+        clearInterval(timerId);
+        delete execPlanUuidToSwapStatusDisplayManager[execPlanUuid];
+      }
+    }
   }
 
   async function startSwap() {
@@ -270,16 +365,17 @@ export default function Trade() {
             />
           </Box>
           <Box>
-          <Text
+            <Text
               // mt="1rem"
               width="100%"
               size="5rem"
               textAlign="right"
               bg="rgb(247, 248, 250)"
               color="gray"
-              fontSize='xs'
+              fontSize="xs"
             >
-              {srcTokenBalance !== undefined && `Balance: ${readableTokenBalance} ${srcToken?.symbol}`}
+              {srcTokenBalance !== undefined &&
+                `Balance: ${readableTokenBalance} ${srcToken?.symbol}`}
             </Text>
             <Input
               mt="1rem"
@@ -310,7 +406,7 @@ export default function Trade() {
               textAlign="right"
               bg="rgb(247, 248, 250)"
               color="gray"
-              fontSize='s'
+              fontSize="s"
             >
               ${srcUsd.toFixed(4)}
             </Text>
@@ -398,7 +494,7 @@ export default function Trade() {
               textAlign="right"
               bg="rgb(247, 248, 250)"
               color="gray"
-              fontSize='s'
+              fontSize="s"
             >
               ${destUsd.toFixed(4)}
             </Text>

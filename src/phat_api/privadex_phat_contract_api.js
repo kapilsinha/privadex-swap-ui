@@ -39,6 +39,25 @@ async function contractApi(api, pruntimeUrl, contract) {
   return contractApi;
 }
 
+export class SwapStatus {
+  simpleStatus;
+  numConfirmedSteps;
+  totalSteps;
+
+  constructor(simpleStatus, numConfirmedSteps, totalSteps) {
+    this.simpleStatus = simpleStatus;
+    this.numConfirmedSteps = numConfirmedSteps;
+    this.totalSteps = totalSteps;
+  }
+}
+
+export const SimpleSwapStatus = {
+  Unknown: 0,
+  Confirmed: 1,
+  Failed: 2,
+  InProgress: 3, // includes NotStarted and Submitted cases
+};
+
 export class PrivaDexAPI {
   #contractApi;
   #certSudo;
@@ -105,11 +124,6 @@ export class PrivaDexAPI {
         this.#certSudo,
         {}
       );
-    console.log(
-      "PrivaDEX escrow =",
-      escrowAddress,
-      escrowAddress.output.asOk.toString()
-    );
     return escrowAddress.output.asOk.toString();
   }
 
@@ -150,7 +164,7 @@ export class PrivaDexAPI {
     destTokenEncoded,
     amountIn
   ) {
-    const exec_plan_uuid = await this.#contractApi.query.startSwap(
+    const execPlanUuid = await this.#contractApi.query.startSwap(
       this.#certSudo,
       {},
       userToEscrowTransferEthTxn.replace("0x", ""),
@@ -162,8 +176,53 @@ export class PrivaDexAPI {
       destTokenEncoded,
       amountIn.toString()
     );
-    let uuid = exec_plan_uuid.output.asOk.toString('hex')
-    console.log("PrivaDEX UUID =", exec_plan_uuid.output.asOk, uuid);
+    let uuid = execPlanUuid.output.asOk.toString("hex");
+    console.log("PrivaDEX UUID =", execPlanUuid.output.asOk, uuid);
     return uuid;
+  }
+
+  async getStatus(execPlanUuid) /* -> SwapStatus */ {
+    const execPlan = await this.#contractApi.query.getExecPlan(
+      this.#certSudo,
+      {},
+      execPlanUuid.replace("0x", "")
+    );
+    if (!execPlan.output.isOk) {
+      return new SwapStatus(SimpleSwapStatus.Unknown, 0, 0);
+    }
+    let unwrapped = execPlan.output.asOk;
+    let steps = [unwrapped.prestartUserToEscrowTransfer]
+      .concat(unwrapped.paths[0].steps)
+      .concat([unwrapped.postendEscrowToUserTransfer]);
+    let totalSteps = unwrapped.paths[0].steps.length + 2;
+    var numConfirmedSteps = 0;
+    for (const step of steps) {
+      let stepStatus = this.getStepStatus(step);
+      if (stepStatus === SimpleSwapStatus.Failed) {
+        return new SwapStatus(
+          SimpleSwapStatus.Failed,
+          numConfirmedSteps,
+          totalSteps
+        );
+      } else if (stepStatus === SimpleSwapStatus.Confirmed) {
+        numConfirmedSteps++;
+      }
+    }
+    let overallStatus =
+      numConfirmedSteps === totalSteps
+        ? SimpleSwapStatus.Confirmed
+        : SimpleSwapStatus.InProgress;
+    return new SwapStatus(overallStatus, numConfirmedSteps, totalSteps);
+  }
+
+  getStepStatus(executionStep) /* -> SimpleSwapStatus */ {
+    let status = executionStep["inner"].value.status;
+    if (status.isConfirmed) {
+      return SimpleSwapStatus.Confirmed;
+    } else if (status.isDropped || status.isFailed) {
+      return SimpleSwapStatus.Failed;
+    }
+    // status.isNotStarted || status.isSubmitted
+    return SimpleSwapStatus.InProgress;
   }
 }
