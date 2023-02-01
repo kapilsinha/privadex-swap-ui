@@ -1,3 +1,4 @@
+const axios = require("axios");
 const pino = require("pino");
 
 const { ApiPromise, WsProvider, Keyring } = require("@polkadot/api");
@@ -52,9 +53,8 @@ class PrivaDexAPI {
     const pruntimeUrl = "https://poc5.phala.network/tee-api-1";
     const sudoAccount = "//Alice";
 
-    const contractPrivadex = loadPrivadexContractFile(
-      "0xefc4881781de25f25f7e6e4a8323ee778229b2921a826f3be281c8226a90173e"
-    );
+    const phatContractId = await axios.get("https://privadex-default-rtdb.firebaseio.com/phat-contract-id.json").then(res => res.data);
+    const contractPrivadex = loadPrivadexContractFile(phatContractId);
 
     // Connect to the chain
     const wsProvider = new WsProvider(nodeUrl);
