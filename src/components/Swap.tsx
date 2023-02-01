@@ -8,6 +8,7 @@ import {
   Stack,
   Text,
   useToast,
+  useColorMode,
 } from "@chakra-ui/react";
 
 import { SettingsIcon, ChevronDownIcon, ArrowDownIcon } from "@chakra-ui/icons";
@@ -54,6 +55,7 @@ export default function Trade() {
   const { account, chainId } = useEthers();
   const config = useConfig();
   const toast = useToast();
+  const { colorMode } = useColorMode();
 
   const [srcQuantity, setSrcQuantity] = useState<number>(0);
   const [estimatedQuote, setEstimatedQuote] = useState<number>(0);
@@ -318,12 +320,11 @@ export default function Trade() {
       <Flex
         alignItems="center"
         p="1rem 1.25rem 0rem"
-        bg="white"
-        color="rgb(86, 90, 105)"
+        bg={colorMode === "dark" ? "#1e1e1e" : "white"}
         justifyContent="space-between"
         borderRadius="1.37rem 1.37rem 0 0"
       >
-        <Text color="black" fontWeight="500">
+        <Text color={colorMode === "dark" ? "white" : "black"} fontWeight="500">
           Swap from:
         </Text>
         {/* <SettingsIcon
@@ -333,11 +334,15 @@ export default function Trade() {
         /> */}
       </Flex>
 
-      <Box p="0.5rem" bg="white" borderRadius="0 0 1.37rem 1.37rem">
+      <Box
+        p="0.5rem"
+        bg={colorMode === "dark" ? "#1e1e1e" : "white"}
+        borderRadius="0 0 1.37rem 1.37rem"
+      >
         <Flex
           alignItems="center"
           justifyContent="space-between"
-          bg="rgb(247, 248, 250)"
+          bg={colorMode === "dark" ? "rgb(41,41,41)" : "rgb(247, 248, 250)"}
           p="1rem 1rem 1.7rem"
           borderRadius="1.25rem"
           border="0.06rem solid rgb(237, 238, 242)"
@@ -370,8 +375,8 @@ export default function Trade() {
               width="100%"
               size="5rem"
               textAlign="right"
-              bg="rgb(247, 248, 250)"
-              color="gray"
+              bg={colorMode === "dark" ? "rgb(41,41,41)" : "rgb(247, 248, 250)"}
+              color={colorMode === "dark" ? "rgb(180,180,180)" : "gray"}
               fontSize="xs"
             >
               {srcTokenBalance !== undefined &&
@@ -385,12 +390,11 @@ export default function Trade() {
               width="100%"
               size="19rem"
               textAlign="right"
-              bg="rgb(247, 248, 250)"
               outline="none"
               border="none"
               focusBorderColor="none"
               type="number"
-              color="black"
+              color={colorMode === "dark" ? "white" : "black"}
               onChange={async function (e) {
                 if (e.target.value !== undefined) {
                   setSrcQuantity(Number(e.target.value));
@@ -404,8 +408,8 @@ export default function Trade() {
               mt="1rem"
               width="100%"
               textAlign="right"
-              bg="rgb(247, 248, 250)"
-              color="gray"
+              bg={colorMode === "dark" ? "rgb(41,41,41)" : "rgb(247, 248, 250)"}
+              color={colorMode === "dark" ? "rgb(180,180,180)" : "gray"}
               fontSize="s"
             >
               ${srcUsd.toFixed(4)}
@@ -415,14 +419,14 @@ export default function Trade() {
         <Flex
           alignItems="center"
           justifyContent="center"
-          // bg="white"
+          bg={colorMode === "dark" ? "#1e1e1e" : "white"}
           p="0.4rem"
           borderRadius="0.75rem"
           pos="relative"
           top="0rem"
         >
           <Text
-            color="black"
+            color={colorMode === "dark" ? "white" : "black"}
             fontWeight="500"
             position={"absolute"}
             left={"0.77rem"}
@@ -431,7 +435,7 @@ export default function Trade() {
             Swap to:
           </Text>
           <ArrowDownIcon
-            bg="rgb(247, 248, 250)"
+            bg={colorMode === "dark" ? "rgb(41,41,41)" : "rgb(247, 248, 250)"}
             color="rgb(128,128,128)"
             // position={"absolute"}
             top={"0rem"}
@@ -443,7 +447,7 @@ export default function Trade() {
         <Flex
           alignItems="center"
           justifyContent="space-between"
-          bg="rgb(247, 248, 250)"
+          bg={colorMode === "dark" ? "rgb(41,41,41)" : "rgb(247, 248, 250)"}
           pos="relative"
           p="1rem 1rem 1.7rem"
           borderRadius="1.25rem"
@@ -479,12 +483,11 @@ export default function Trade() {
               width="100%"
               size="19rem"
               textAlign="right"
-              bg="rgb(247, 248, 250)"
               outline="none"
               border="none"
               focusBorderColor="none"
               type="number"
-              color="black"
+              color={colorMode === "dark" ? "white" : "black"}
               readOnly={true}
               value={estimatedQuote.toFixed(4)}
             />
@@ -492,8 +495,8 @@ export default function Trade() {
               mt="1rem"
               width="100%"
               textAlign="right"
-              bg="rgb(247, 248, 250)"
-              color="gray"
+              bg={colorMode === "dark" ? "rgb(41,41,41)" : "rgb(247, 248, 250)"}
+              color={colorMode === "dark" ? "rgb(180,180,180)" : "gray"}
               fontSize="s"
             >
               ${destUsd.toFixed(4)}
@@ -501,11 +504,9 @@ export default function Trade() {
           </Box>
         </Flex>
         {srcToken && destToken && (
-          <Box color="black">
-            <div>
-              1 {srcToken.symbol} = {estimatedOneSrcTokenQuote.toFixed(4)}{" "}
-              {destToken.symbol}
-            </div>
+          <Box color={colorMode === "dark" ? "white" : "black"}>
+            1 {srcToken.symbol} = {estimatedOneSrcTokenQuote.toFixed(4)}{" "}
+            {destToken.symbol}
           </Box>
         )}
         <SwapButton

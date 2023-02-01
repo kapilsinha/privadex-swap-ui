@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   Flex,
   Menu,
@@ -9,6 +9,7 @@ import {
   useDisclosure,
   Button,
   Switch,
+  useColorModeValue,
 } from "@chakra-ui/react";
 
 import logo from "../assets/logo.svg";
@@ -23,6 +24,10 @@ type Props = {
 export default function Layout({ children }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
+  const [isDarkMode, setIsDarkMode] = useState(colorMode === "dark");
+
+  useEffect(() => setIsDarkMode(colorMode === "dark"), [colorMode]);
+  console.log("Header", colorMode, isDarkMode);
 
   return (
     <Menu>
@@ -38,9 +43,10 @@ export default function Layout({ children }: Props) {
           <Switch
             colorScheme="purple"
             onChange={toggleColorMode}
-            defaultChecked={colorMode === "dark"}
+            isChecked={isDarkMode}
+            alignItems="right"
           >
-            Dark mode
+            Switch to {isDarkMode ? "light" : "dark"} mode
           </Switch>
           <ConnectButton handleOpenModal={onOpen} />
           <HStack spacing={3}>
@@ -62,6 +68,9 @@ export default function Layout({ children }: Props) {
             <SocialIcon
               url="https://github.com/kapilsinha/privadex"
               target="_blank"
+              fgColor="white"
+              bgColor="black"
+              // bgColor={useColorModeValue("black", "rgb(110,110,110)")}
               style={{ height: 35, width: 35 }}
             />
           </HStack>

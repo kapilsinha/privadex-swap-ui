@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Button, Box, Text, Flex } from "@chakra-ui/react";
+import { Button, Box, Text, Flex, useColorMode } from "@chakra-ui/react";
 import { useEthers, useEtherBalance, Astar, Moonbeam } from "@usedapp/core";
 import { formatEther } from "@ethersproject/units";
 import Identicon from "./Identicon";
@@ -11,6 +11,7 @@ type Props = {
 export default function ConnectButton({ handleOpenModal }: Props) {
   const { activateBrowserWallet, account, chainId } = useEthers();
   const etherBalance = useEtherBalance(account);
+  const {colorMode } = useColorMode();
   const nativeTokenName =
     chainId === Moonbeam.chainId
       ? "GLMR"
@@ -24,16 +25,16 @@ export default function ConnectButton({ handleOpenModal }: Props) {
   }
 
   return account ? (
-    <Flex alignItems="center" bg="rgb(247, 248, 250)" borderRadius="xl" py="0" mx="1.5rem">
+    <Flex alignItems="center" bg={colorMode === "dark" ? "rgb(30,30,30)" : "rgb(247, 248, 250)"} borderRadius="xl" py="0" mx="1.5rem">
       <Box px="3">
-        <Text color="black" fontSize="md">
+        <Text color={colorMode === "dark" ? "white" : "black"} fontSize="md">
           {etherBalance && parseFloat(formatEther(etherBalance)).toFixed(0)}{" "}
           {nativeTokenName}
         </Text>
       </Box>
       <Button
         onClick={handleOpenModal}
-        bg="white"
+        bg={colorMode === "dark" ? "black" : "white"}
         border="0.06rem solid transparent"
         _hover={{
           border: "0.06rem",
@@ -45,7 +46,7 @@ export default function ConnectButton({ handleOpenModal }: Props) {
         px={3}
         h="2.37rem"
       >
-        <Text color="black" fontSize="md" fontWeight="medium" mr="2">
+        <Text color={colorMode === "dark" ? "white" : "black"} fontSize="md" fontWeight="medium" mr="2">
           {account &&
             `${account.slice(0, 6)}...${account.slice(
               account.length - 4,

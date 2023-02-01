@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useFormspark } from "@formspark/use-formspark";
-import { Box, CloseButton, Stack } from "@chakra-ui/react";
+import { Box, CloseButton, Stack, Textarea, useColorMode } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
+import { priva_lavender, priva_turquoise } from "../theme"
 
 
 type Props = {
@@ -15,6 +16,8 @@ export default function FeedbackForm({ nrows }: Props) {
   const [message, setMessage] = useState("");
   const [hidden, setHidden] = useState(false);
   const { account, chainId } = useEthers();
+  const { colorMode } = useColorMode();
+  
   return (
     <Box hidden={hidden}>
       <form
@@ -37,8 +40,9 @@ export default function FeedbackForm({ nrows }: Props) {
             <br />
             We'd love to get your feedback!
           </label>
-          <textarea
+          <Textarea
             value={message}
+            bg={colorMode === "dark" ? "#1e1e1e" : "white"}
             onChange={(e) => setMessage(e.target.value)}
             rows={nrows}
             cols={30}
@@ -50,12 +54,12 @@ export default function FeedbackForm({ nrows }: Props) {
             <Box
               mt="0.5rem"
               color="white"
-              bg="rgb(187,142,224)"
+              bg={priva_lavender}
               width="100%"
               p="0.5rem 1rem"
               borderRadius="1.25rem"
               fontWeight="900"
-              _hover={{ bg: "rgb(119,204,255)" }}
+              _hover={{ bg: priva_turquoise }}
             >
               Send Feedback
             </Box>

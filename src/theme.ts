@@ -3,8 +3,8 @@ import { mode } from '@chakra-ui/theme-tools';
 import { Dict } from "@chakra-ui/utils";
 
 const config: ThemeConfig = {
-  initialColorMode: "light",
-  useSystemColorMode: false,
+  initialColorMode: "system",
+  useSystemColorMode: true,
 };
 
 const fonts = {
@@ -12,17 +12,33 @@ const fonts = {
   body: "Inter",
 };
 
-const colors = {
-  priva_purple: {100: "#41259a"},
-  priva_lavender: {100: "#bb8ee0"},
-  priva_turquoise: {100: "#77ccff"}
-}
+export const priva_lavender = "rgb(187,142,224)";
+export const priva_grayed_lavender = "rgb(187,169,198)";
+export const priva_turquoise = "rgb(119,204,255)";
+export const priva_purple = "rgb(65,37,154)";
 
 const styles = {
   global: (props: Dict<any>) => ({
     body: {
+      // color: mode('gray.800', 'whiteAlpha.900')(props),
+      // background: mode('#f2f2f2', '#292929')(props),
       color: mode('gray.800', 'whiteAlpha.900')(props),
-      background: mode('gray.100', '#141214')(props),
+      bg: mode('#f2f2f2', '#292929')(props),
+    },
+    '*::placeholder': {
+      color: mode('gray.400', 'whiteAlpha.600')(props),
+    },
+    '#tokenlist thead': {
+      background: mode('white', '#404040')(props),
+    },
+    '#tokenlist tbody tr:nth-of-type(odd)': {
+      background: mode('#dfdfdf', '#1d1d1d')(props),
+    },
+    '#tokenlist tbody tr:nth-of-type(even)': {
+      background: mode('white', '#404040')(props),
+    },
+    '#tokenlist tbody tr:hover': {
+      background: '#acdfff',
     },
   }),
 };
@@ -30,7 +46,6 @@ const styles = {
 const theme = extendTheme({
   config,
   fonts,
-  colors,
   styles
 });
 

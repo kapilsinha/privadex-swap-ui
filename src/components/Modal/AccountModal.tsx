@@ -11,6 +11,7 @@ import {
   ModalBody,
   ModalCloseButton,
   Text,
+  useColorMode,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon, CopyIcon } from "@chakra-ui/icons";
 import { useEthers } from "@usedapp/core";
@@ -23,6 +24,7 @@ type Props = {
 
 export default function AccountModal({ isOpen, onClose }: Props) {
   const { account, deactivate } = useEthers();
+  const {colorMode } = useColorMode();
 
   function handleDeactivateAccount() {
     deactivate();
@@ -33,17 +35,17 @@ export default function AccountModal({ isOpen, onClose }: Props) {
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="md">
       <ModalOverlay />
       <ModalContent
-        background="white"
+        background={colorMode === "dark" ? "black" : "white"}
         border="0.06rem"
         borderStyle="solid"
         borderColor="gray.300"
         borderRadius="3xl"
       >
-        <ModalHeader color="black" px={4} fontSize="lg" fontWeight="medium">
+        <ModalHeader color={colorMode === "dark" ? "white" : "black"} px={4} fontSize="lg" fontWeight="medium">
           Account
         </ModalHeader>
         <ModalCloseButton
-          color="black"
+          color={colorMode === "dark" ? "white" : "black"}
           fontSize="sm"
           _hover={{
             color: "gray.600",
@@ -61,7 +63,7 @@ export default function AccountModal({ isOpen, onClose }: Props) {
             mb={3}
           >
             <Flex justifyContent="space-between" alignItems="center" mb={3}>
-              <Text color="rgb(110, 114, 125);" fontSize="sm">
+              <Text color={colorMode === "dark" ? "rgb(180,180,180)" : "gray"} fontSize="sm">
                 Connected with MetaMask
               </Text>
               <Button
@@ -86,7 +88,7 @@ export default function AccountModal({ isOpen, onClose }: Props) {
             <Flex alignItems="center" mt={2} mb={4} lineHeight={1}>
               <Identicon />
               <Text
-                color="black"
+                color={colorMode === "dark" ? "white" : "black"}
                 fontSize="xl"
                 fontWeight="semibold"
                 ml="2"
@@ -101,7 +103,7 @@ export default function AccountModal({ isOpen, onClose }: Props) {
             <Flex alignContent="center" m={3}>
               <Button
                 variant="link"
-                color="rgb(110, 114, 125)"
+                color={colorMode === "dark" ? "rgb(180,180,180)" : "gray"}
                 fontWeight="normal"
                 fontSize="0.825rem"
                 onClick={() => {navigator.clipboard.writeText(account || "")}}
