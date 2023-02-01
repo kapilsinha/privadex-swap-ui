@@ -1,6 +1,7 @@
 import { Button, Box } from "@chakra-ui/react";
 import { Astar, Moonbeam, useConnector, useEthers } from "@usedapp/core";
 import { Token } from "../data_models/Token";
+import { priva_grayed_lavender, priva_lavender, priva_turquoise } from "../theme";
 
 type Props = {
   srcChain: string;
@@ -55,11 +56,11 @@ export default function SwapButton({
             startSwap();
           }}
           color="white"
-          bg="rgb(187,142,224)"
+          bg={priva_lavender}
           width="100%"
           p="1.62rem"
           borderRadius="1.25rem"
-          _hover={{ bg: "rgb(119,204,255)" }}
+          _hover={{ bg: priva_turquoise }}
           disabled={disabled}
         >
           Swap
@@ -69,11 +70,11 @@ export default function SwapButton({
       <Box mt="0.5rem">
         <Button
           color="white"
-          bg="rgb(187,169,198)"
+          bg={priva_grayed_lavender}
           width="100%"
           p="1.62rem"
           borderRadius="1.25rem"
-          _hover={{ bg: "rgb(187,169,198)" }}
+          _hover={{ bg: priva_grayed_lavender }}
           disabled={disabled}
         >
           {areTokensSelected
@@ -89,11 +90,11 @@ export default function SwapButton({
       <Button
         onClick={handleConnectWallet}
         color="white"
-        bg="rgb(187,142,224)"
+        bg={priva_lavender}
         width="100%"
         p="1.62rem"
         borderRadius="1.25rem"
-        _hover={{ bg: "rgb(119,204,255)" }}
+        _hover={{ bg: priva_turquoise }}
         disabled={disabled}
       >
         {account === undefined

@@ -2,6 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import { DAppProvider, Config, Astar, Moonbeam, MetamaskConnector } from "@usedapp/core";
+import { ColorModeScript } from "@chakra-ui/react";
+import theme from './theme'
 
 
 const config: Config = {
@@ -20,6 +22,7 @@ const config: Config = {
 ReactDOM.render(
     <React.StrictMode>
       <DAppProvider config={config}>
+        <ColorModeScript initialColorMode={theme.config.initialColorMode} />
         <App />
       </DAppProvider>
     </React.StrictMode>,

@@ -10,6 +10,7 @@ import {
   Text,
   Input,
   Link,
+  useColorMode,
 } from "@chakra-ui/react";
 // Can use later to make the table pretty but requires more work
 // import ReactTable from "react-table";
@@ -37,6 +38,7 @@ export default function TokenModal({
   const crypto = token_list.map((x) => Token.fromJSON(x));
   // console.log(crypto);
   const [search, setSearch] = useState<any>("");
+  const { colorMode } = useColorMode();
 
 
   function getChainExplorerLink(token_addr: string) {
@@ -61,32 +63,31 @@ export default function TokenModal({
     <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">
       <ModalOverlay />
       <ModalContent
-        background="white"
+        background={colorMode === "dark" ? "black" : "white"}
         border="0.06rem"
         borderStyle="solid"
         borderColor="gray.300"
         borderRadius="3xl"
       >
-        <ModalHeader color="black" px={4} fontSize="lg" fontWeight="medium">
+        <ModalHeader color={colorMode === "dark" ? "white" : "black"} px={4} fontSize="lg" fontWeight="medium">
           Select A Token
         </ModalHeader>
         <ModalCloseButton
-          color="black"
+          color={colorMode === "dark" ? "white" : "black"}
           fontSize="sm"
           _hover={{
             color: "gray.600",
           }}
         />
-        <ModalBody pt={0} px={4}>
+        <ModalBody py={0} px={4} >
           <Box
             borderRadius="3xl"
             border="0.06rem"
             borderStyle="solid"
             borderColor="gray.300"
             px={5}
-            pt={4}
-            pb={2}
-            mb={3}
+            py={2}
+            mb={-5}
           >
             <Input
               placeholder="Search token name / symbol / address"
@@ -101,7 +102,7 @@ export default function TokenModal({
               onChange={(e) => {
                 setSearch(e.target.value);
               }}
-              color="black"
+              color={colorMode === "dark" ? "white" : "black"}
             />
           </Box>
           {/*<Box color="black" display="flex">*/}
@@ -114,12 +115,11 @@ export default function TokenModal({
             >
               <thead>
                 <tr>
-                  <td>Name</td>
-                  <td>Symbol</td>
-                  <td>Address</td>
+                  <td align="center">Name</td>
+                  <td align="center">Symbol</td>
+                  <td align="center">Address</td>
                 </tr>
               </thead>
-              {/* <tbody> */}
               <tbody>
                 {
                   crypto
@@ -159,7 +159,7 @@ export default function TokenModal({
                                 backgroundColor:
                                   token.getAddressFromEncodedTokenName() ===
                                   selectedToken?.getAddressFromEncodedTokenName()
-                                    ? "rgb(208, 172, 235)"
+                                    ? "rgb(208,172,235)"
                                     : "",
                               }}
                               hidden={hidden}
