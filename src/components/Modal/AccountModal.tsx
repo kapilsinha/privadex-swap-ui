@@ -104,6 +104,7 @@ export default function AccountModal({ isOpen, onClose }: Props) {
                 color="rgb(110, 114, 125)"
                 fontWeight="normal"
                 fontSize="0.825rem"
+                onClick={() => {navigator.clipboard.writeText(account || "")}}
                 _hover={{
                   textDecoration: "none",
                   color: "rgb(110, 114, 125)",
