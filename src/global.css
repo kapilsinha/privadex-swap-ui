@@ -8,6 +8,11 @@
 body {
     background: #f2f2f2 !important;
 }
+.dark-mode {
+  background: black;
+  color: white;
+}
+
 .App {
   height: auto;
   display: flex;
