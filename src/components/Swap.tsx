@@ -9,6 +9,7 @@ import {
   Text,
   useToast,
   useColorMode,
+  HStack,
 } from "@chakra-ui/react";
 
 import { SettingsIcon, ChevronDownIcon, ArrowDownIcon } from "@chakra-ui/icons";
@@ -57,7 +58,6 @@ export default function Trade() {
   const toast = useToast();
   const { colorMode } = useColorMode();
 
-  const [srcQuantity, setSrcQuantity] = useState<number>(0);
   const [estimatedQuote, setEstimatedQuote] = useState<number>(0);
   const [srcUsd, setSrcUsd] = useState<number>(0);
   const [destUsd, setDestUsd] = useState<number>(0);
@@ -68,6 +68,15 @@ export default function Trade() {
   const [srcChain, setSrcChain] = useState<string>("moonbeam"); // arbitrarily selected one of the chains
   const [destChain, setDestChain] = useState<string>("astar");
   const [disabled, setDisabled] = useState<boolean>(false);
+  const [srcQuantity, setSrcQuantity] = useState<BigInt>(BigInt(0));
+  const readableSrcQuantity =
+    srcQuantity && srcToken
+      ? Number(
+          srcQuantity.valueOf() /
+            BigInt(10 ** Math.max(0, srcToken.decimals - 10))
+        ) /
+        10 ** Math.min(srcToken.decimals, 10)
+      : 0;
 
   const isSrcTokenNative =
     srcToken?.getAddressFromEncodedTokenName() === "native";
@@ -89,10 +98,7 @@ export default function Trade() {
     ? Number(srcTokenBalance / BigInt(10 ** (srcToken?.decimals - 4))) / 10000
     : 0;
   const userHasSufficientBalance =
-    srcToken && srcTokenBalance
-      ? srcTokenBalance >=
-        BigInt(Math.floor(srcQuantity * 10 ** srcToken.decimals))
-      : false;
+    srcToken && srcTokenBalance ? srcTokenBalance >= srcQuantity : false;
 
   // Used to update the user about the status of their swap. Should abstract into a different
   // file or class later
@@ -152,7 +158,7 @@ export default function Trade() {
       account, // TODO: need to let the user specify this
       srcToken!.tokenNameEncoded,
       destToken!.tokenNameEncoded,
-      BigInt(Math.floor(srcQuantity * 10 ** srcToken!.decimals))
+      srcQuantity
     );
     let capSrcChain = srcChain.charAt(0).toUpperCase() + srcChain.slice(1);
     let capDestChain = destChain.charAt(0).toUpperCase() + destChain.slice(1);
@@ -188,6 +194,7 @@ export default function Trade() {
           status: "success",
           duration: 16000,
           isClosable: true,
+          position: "top-right",
         });
         clearInterval(timerId);
         delete execPlanUuidToSwapStatusDisplayManager[execPlanUuid];
@@ -203,6 +210,7 @@ export default function Trade() {
           status: "info",
           duration: 16000,
           isClosable: true,
+          position: "top-right",
         });
       } else if (execPlanStatus.simpleStatus === SimpleSwapStatus.Failed) {
         toast({
@@ -214,6 +222,7 @@ export default function Trade() {
           status: "error",
           duration: null,
           isClosable: true,
+          position: "top-right",
         });
         clearInterval(timerId);
         delete execPlanUuidToSwapStatusDisplayManager[execPlanUuid];
@@ -226,13 +235,13 @@ export default function Trade() {
     // (srcToken and destToken are set, we are on srcChain, and srcQuantity > 0)
     let escrowAddress = await privadexApi.current.escrowEthAddress();
     let srcTokenAddress = srcToken!.getAddressFromEncodedTokenName();
-    let amountIn = BigInt(Math.floor(srcQuantity * 10 ** srcToken?.decimals));
+    let amountIn = srcQuantity;
     let receipt;
     setDisabled(true);
     if (srcTokenAddress === "native") {
       receipt = await sendTransaction({
         to: escrowAddress,
-        value: amountIn,
+        value: BigNumber.from(amountIn),
         gasLimit: BigNumber.from(21000),
       });
     } else {
@@ -256,13 +265,13 @@ export default function Trade() {
 
   useEffect(() => {
     const timeOutId = setTimeout(async () => {
-      if (srcToken && destToken && srcQuantity > 0) {
+      if (srcToken && destToken && srcQuantity > BigInt(0)) {
         let [rawQuote, srcUsd, destUsd] = await privadexApi.current.quote(
           srcChain,
           destChain,
           srcToken.tokenNameEncoded,
           destToken.tokenNameEncoded,
-          BigInt(Math.floor(srcQuantity * 10 ** srcToken.decimals))
+          srcQuantity
         );
         let quote = Number(rawQuote) / 10 ** destToken.decimals;
         // console.log("quote =", quote);
@@ -282,7 +291,7 @@ export default function Trade() {
           destChain,
           srcToken.tokenNameEncoded,
           destToken.tokenNameEncoded,
-          BigInt(Math.floor(10 ** srcToken.decimals))
+          BigInt(10 ** srcToken.decimals)
         );
         let quote = Number(rawQuote) / 10 ** destToken.decimals;
         setEstimatedOneSrcTokenQuote(quote);
@@ -313,7 +322,12 @@ export default function Trade() {
           activatedIsSrcTokenModal.current === true ? destToken : srcToken
         }
         setSelectedToken={
-          activatedIsSrcTokenModal.current === true ? setSrcToken : setDestToken
+          activatedIsSrcTokenModal.current === true
+            ? (token: Token) => {
+                setSrcQuantity(BigInt(0));
+                setSrcToken(token);
+              }
+            : setDestToken
         }
       />
 
@@ -382,28 +396,51 @@ export default function Trade() {
               {srcTokenBalance !== undefined &&
                 `Balance: ${readableTokenBalance} ${srcToken?.symbol}`}
             </Text>
-            <Input
-              mt="1rem"
-              placeholder="0.0"
-              fontWeight="500"
-              fontSize="1.5rem"
-              width="100%"
-              size="19rem"
-              textAlign="right"
-              outline="none"
-              border="none"
-              focusBorderColor="none"
-              type="number"
-              color={colorMode === "dark" ? "white" : "black"}
-              onChange={async function (e) {
-                if (e.target.value !== undefined) {
-                  setSrcQuantity(Number(e.target.value));
-                } else {
-                  console.log("src quantity is undefined");
-                }
-              }}
-              disabled={disabled}
-            />
+            <HStack spacing={1} mt="1rem">
+              <Input
+                placeholder="0.0"
+                fontWeight="500"
+                fontSize="1.5rem"
+                width="100%"
+                size="19rem"
+                textAlign="right"
+                outline="none"
+                border="none"
+                focusBorderColor="none"
+                type="number"
+                color={colorMode === "dark" ? "white" : "black"}
+                value={readableSrcQuantity}
+                onChange={async function (e) {
+                  if (e.target.value !== undefined && srcToken !== null) {
+                    setSrcQuantity(
+                      BigInt(10 ** Math.max(0, srcToken.decimals - 10)) *
+                        BigInt(
+                          Math.floor(
+                            Number(e.target.value) *
+                              10 ** Math.min(srcToken.decimals, 10)
+                          )
+                        )
+                    );
+                  } else {
+                    console.log(
+                      "src quantity is undefined or src token is null"
+                    );
+                  }
+                }}
+                disabled={disabled}
+              />
+              {srcQuantity !== srcTokenBalance && (
+                <Button
+                  onClick={() => {
+                    if (srcTokenBalance) {
+                      setSrcQuantity(srcTokenBalance);
+                    }
+                  }}
+                >
+                  MAX
+                </Button>
+              )}
+            </HStack>
             <Text
               mt="1rem"
               width="100%"

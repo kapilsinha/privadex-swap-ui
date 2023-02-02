@@ -27,7 +27,6 @@ export default function Layout({ children }: Props) {
   const [isDarkMode, setIsDarkMode] = useState(colorMode === "dark");
 
   useEffect(() => setIsDarkMode(colorMode === "dark"), [colorMode]);
-  console.log("Header", colorMode, isDarkMode);
 
   return (
     <Menu>
