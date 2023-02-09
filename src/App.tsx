@@ -10,6 +10,7 @@ import FeedbackForm from "./components/FeedbackForm";
 
 import "@fontsource/inter";
 import "./global.css";
+import Footer from "./components/Footer";
 
 function App() {
   const [isScreenWideEnough] = useMediaQuery("(min-width: 1150px)");
@@ -23,8 +24,11 @@ function App() {
           <FeedbackForm nrows={5} />
         </Flex>
       ) : (
-        <FeedbackForm nrows={3} />
+        <Flex px="5" left="0rem" bottom="2rem" justifyContent="center">
+          <FeedbackForm nrows={3} />
+        </Flex>
       )}
+      <Footer />
     </ChakraProvider>
   );
 }
