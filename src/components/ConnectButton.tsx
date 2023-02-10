@@ -6,9 +6,10 @@ import Identicon from "./Identicon";
 
 type Props = {
   handleOpenModal: any;
+  fontSize: string;
 };
 
-export default function ConnectButton({ handleOpenModal }: Props) {
+export default function ConnectButton({ handleOpenModal, fontSize }: Props) {
   const { activateBrowserWallet, account, chainId } = useEthers();
   const etherBalance = useEtherBalance(account);
   const {colorMode } = useColorMode();
@@ -27,7 +28,7 @@ export default function ConnectButton({ handleOpenModal }: Props) {
   return account ? (
     <Flex alignItems="center" bg={colorMode === "dark" ? "rgb(30,30,30)" : "rgb(247, 248, 250)"} borderRadius="xl" py="0" mx="1.5rem">
       <Box px="3">
-        <Text color={colorMode === "dark" ? "white" : "black"} fontSize="md">
+        <Text color={colorMode === "dark" ? "white" : "black"} fontSize={fontSize}>
           {etherBalance && parseFloat(formatEther(etherBalance)).toFixed(0)}{" "}
           {nativeTokenName}
         </Text>
@@ -46,7 +47,7 @@ export default function ConnectButton({ handleOpenModal }: Props) {
         px={3}
         h="2.37rem"
       >
-        <Text color={colorMode === "dark" ? "white" : "black"} fontSize="md" fontWeight="medium" mr="2">
+        <Text color={colorMode === "dark" ? "white" : "black"} fontSize={fontSize} fontWeight="medium" mr="2">
           {account &&
             `${account.slice(0, 6)}...${account.slice(
               account.length - 4,
@@ -61,7 +62,7 @@ export default function ConnectButton({ handleOpenModal }: Props) {
       onClick={handleConnectWallet}
       bg="rgb(253, 234, 241)"
       color="rgb(213, 0, 102)"
-      fontSize="1rem"
+      fontSize={fontSize}
       fontWeight="semibold"
       borderRadius="xl"
       border="0.06rem solid rgb(253, 234, 241)"

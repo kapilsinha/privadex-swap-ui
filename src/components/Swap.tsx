@@ -10,6 +10,7 @@ import {
   useToast,
   useColorMode,
   HStack,
+  useMediaQuery,
 } from "@chakra-ui/react";
 
 import { SettingsIcon, ChevronDownIcon, ArrowDownIcon } from "@chakra-ui/icons";
@@ -68,6 +69,7 @@ export default function Trade() {
   const [srcChain, setSrcChain] = useState<string>("moonbeam"); // arbitrarily selected one of the chains
   const [destChain, setDestChain] = useState<string>("astar");
   const [disabled, setDisabled] = useState<boolean>(false);
+
   const [srcQuantity, setSrcQuantity] = useState<BigInt>(BigInt(0));
   const readableSrcQuantity =
     srcQuantity && srcToken
@@ -94,11 +96,30 @@ export default function Trade() {
         (chainId === Astar.chainId && srcChain === "astar")
       ? etherBalance?.toBigInt()
       : undefined;
-  const readableTokenBalance = srcTokenBalance
+  const readableSrcTokenBalance = srcTokenBalance
     ? Number(srcTokenBalance / BigInt(10 ** (srcToken?.decimals - 4))) / 10000
     : 0;
   const userHasSufficientBalance =
     srcToken && srcTokenBalance ? srcTokenBalance >= srcQuantity : false;
+
+  const isDestTokenNative =
+    destToken?.getAddressFromEncodedTokenName() === "native";
+  const destErc20Balance: BigNumber | undefined = useTokenBalance(
+    isDestTokenNative === false && srcChain === destChain
+      ? destToken?.getAddressFromEncodedTokenName()
+      : undefined,
+    account
+  );
+  const destTokenBalance =
+    isDestTokenNative === false
+      ? destErc20Balance?.toBigInt()
+      : (chainId === Moonbeam.chainId && destChain === "moonbeam") ||
+        (chainId === Astar.chainId && destChain === "astar")
+      ? etherBalance?.toBigInt()
+      : undefined;
+  const readableDestTokenBalance = destTokenBalance
+    ? Number(destTokenBalance / BigInt(10 ** (destToken?.decimals - 4))) / 10000
+    : 0;
 
   // Used to update the user about the status of their swap. Should abstract into a different
   // file or class later
@@ -300,9 +321,12 @@ export default function Trade() {
     return () => clearTimeout(timeOutId);
   }, [srcToken, destToken, srcChain, destChain]);
 
+  const [isScreenSmallWidth] = useMediaQuery("(max-width: 325px)");
+  const [isScreenFullWidth] = useMediaQuery("(min-width: 475px)");
+
   return (
     <Box
-      w="30.62rem"
+      w={isScreenFullWidth ? "475px" : "calc(98vw)"}
       mx="auto"
       mt="3.5rem"
       mb="1.5rem"
@@ -373,6 +397,7 @@ export default function Trade() {
                 setSrcChain(chainName);
               }}
               disabled={disabled}
+              fontSize={isScreenSmallWidth ? "small" : "medium"}
             />
             <TokenSelect
               /*image={window.__imageSelected}*/ openTokenModal={onOpen}
@@ -394,13 +419,13 @@ export default function Trade() {
               fontSize="xs"
             >
               {srcTokenBalance !== undefined &&
-                `Balance: ${readableTokenBalance} ${srcToken?.symbol}`}
+                `Balance: ${readableSrcTokenBalance} ${srcToken?.symbol}`}
             </Text>
-            <HStack spacing={1} mt="1rem">
+            <HStack spacing={1} mt="2rem" ml="-1.25rem">
               <Input
                 placeholder="0.0"
                 fontWeight="500"
-                fontSize="1.5rem"
+                fontSize={isScreenFullWidth ? "1.5rem" : "1.25rem"}
                 width="100%"
                 size="19rem"
                 textAlign="right"
@@ -502,6 +527,7 @@ export default function Trade() {
                 setDestChain(chainName);
               }}
               disabled={disabled}
+              fontSize={isScreenSmallWidth ? "small" : "medium"}
             />
             <TokenSelect
               /*image={window.__imageSelected2}*/ openTokenModal={onOpen}
@@ -513,10 +539,22 @@ export default function Trade() {
             />
           </Box>
           <Box>
+            <Text
+              // mt="1rem"
+              width="100%"
+              size="5rem"
+              textAlign="right"
+              bg={colorMode === "dark" ? "rgb(41,41,41)" : "rgb(247, 248, 250)"}
+              color={colorMode === "dark" ? "rgb(180,180,180)" : "gray"}
+              fontSize="xs"
+            >
+              {destTokenBalance !== undefined &&
+                `Balance: ${readableDestTokenBalance} ${destToken?.symbol}`}
+            </Text>
             <Input
               mt="2rem"
               placeholder="0.0"
-              fontSize="1.5rem"
+              fontSize={isScreenFullWidth ? "1.5rem" : "1.25rem"}
               width="100%"
               size="19rem"
               textAlign="right"

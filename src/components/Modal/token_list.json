@@ -38,7 +38,7 @@
         "chain": "moonbeam",
         "token_name_encoded": "xc20,id=42259045809535163221576417993425387648",
         "symbol": "xcDOT",
-        "name": "xcDOT",
+        "name": "Polkadot",
         "decimals": 10
     },
     {
@@ -65,8 +65,8 @@
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0x3795c36e7d12a8c252a20c5a7b455f7c57b60283",
-        "symbol": "USDT",
-        "name": "Tether USD",
+        "symbol": "USDT.ce",
+        "name": "Tether USD (Celer)",
         "decimals": 6
     },
     {
@@ -107,8 +107,8 @@
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0x4792c1ecb969b036eb51330c63bd27899a13d84e",
-        "symbol": "AVAX",
-        "name": "Avalanche",
+        "symbol": "AVAX.multi",
+        "name": "Avalanche (Multichain)",
         "decimals": 18
     },
     {
@@ -149,57 +149,57 @@
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0x7f27352d5f83db87a5a3e00f4b07cc2138d8ee52",
-        "symbol": "BNB",
-        "name": "Binance Coin",
+        "symbol": "BNB.ce",
+        "name": "Binance Coin (Celer)",
         "decimals": 18
     },
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0xc9baa8cfdde8e328787e29b4b078abf2dadc2055",
-        "symbol": "BNB",
-        "name": "Binance",
+        "symbol": "BNB.multi",
+        "name": "Binance (Multichain)",
         "decimals": 18
     },
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0xa649325aa7c5093d12d6f98eb4378deae68ce23f",
-        "symbol": "BUSD",
-        "name": "Binance-Peg BUSD Token",
+        "symbol": "BUSD.multi",
+        "name": "Binance-Peg BUSD Token (Multichain)",
         "decimals": 18
     },
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0x4bf769b05e832fcdc9053fffbc78ca889acb5e1e",
-        "symbol": "BUSD",
-        "name": "Binance USD",
+        "symbol": "BUSD.ce",
+        "name": "Binance USD (Celer)",
         "decimals": 18
     },
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0x765277eebeca2e31912c9946eae1021199b39c61",
-        "symbol": "DAI",
-        "name": "Dai Stablecoin",
+        "symbol": "DAI.multi",
+        "name": "Dai Stablecoin (Multichain)",
         "decimals": 18
     },
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0x6de33698e9e9b787e09d3bd7771ef63557e148bb",
-        "symbol": "DAI",
-        "name": "Dai Stablecoin",
+        "symbol": "DAI.ce",
+        "name": "Dai Stablecoin (Celer)",
         "decimals": 18
     },
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0xfa9343c3897324496a05fc75abed6bac29f8a40f",
-        "symbol": "ETH",
-        "name": "Ethereum",
+        "symbol": "WETH.multi",
+        "name": "Wrapped Ether (Multichain)",
         "decimals": 18
     },
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0xc19281f22a075e0f10351cd5d6ea9f0ac63d4327",
-        "symbol": "FTM",
-        "name": "Fantom",
+        "symbol": "FTM.multi",
+        "name": "Fantom (Multichain)",
         "decimals": 18
     },
     {
@@ -219,8 +219,8 @@
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0x431d5dff03120afa4bdf332c61a6e1766ef37bdb",
-        "symbol": "JPYC",
-        "name": "JPY Coin",
+        "symbol": "JPYC.ce",
+        "name": "JPY Coin (Celer)",
         "decimals": 18
     },
     {
@@ -240,15 +240,15 @@
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0xdd90e5e87a2081dcf0391920868ebc2ffb81a1af",
-        "symbol": "MATIC",
-        "name": "Matic Token",
+        "symbol": "MATIC.ce",
+        "name": "Matic Token (Celer)",
         "decimals": 18
     },
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0x3405a1bd46b85c5c029483fbecf2f3e611026e45",
-        "symbol": "MATIC",
-        "name": "Matic",
+        "symbol": "MATIC.multi",
+        "name": "Matic (Multichain)",
         "decimals": 18
     },
     {
@@ -282,8 +282,8 @@
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0x75364d4f779d0bd0facd9a218c67f87dd9aff3b4",
-        "symbol": "SDN",
-        "name": "Shiden Network",
+        "symbol": "SDN.ce",
+        "name": "Shiden Network (Celer)",
         "decimals": 18
     },
     {
@@ -303,8 +303,8 @@
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0x6a2d262d56735dba19dd70682b39f6be9a931d98",
-        "symbol": "ceUSDC",
-        "name": "USD Coin",
+        "symbol": "USDC.ce",
+        "name": "USD Coin (Celer)",
         "decimals": 6
     },
     {
@@ -324,15 +324,15 @@
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0xefaeee334f0fd1712f9a8cc375f427d9cdd40d73",
-        "symbol": "USDT",
-        "name": "Tether USD",
+        "symbol": "USDT.multi",
+        "name": "Tether USD (Multichain)",
         "decimals": 6
     },
     {
         "chain": "astar",
         "token_name_encoded": "xc20,id=4294969280",
         "symbol": "USDT",
-        "name": "Tether USD",
+        "name": "Tether USD (Polkadot-Native)",
         "decimals": 6
     },
     {
@@ -345,15 +345,15 @@
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0xe57ebd2d67b462e9926e04a8e33f01cd0d64346d",
-        "symbol": "WBTC",
-        "name": "Wrapped BTC",
+        "symbol": "WBTC.wh",
+        "name": "Wrapped BTC (Wormhole)",
         "decimals": 8
     },
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0xad543f18cff85c77e140e3e5e3c3392f6ba9d5ca",
-        "symbol": "WBTC",
-        "name": "Wrapped BTC",
+        "symbol": "WBTC.ce",
+        "name": "Wrapped BTC (Celer)",
         "decimals": 8
     },
     {
@@ -366,22 +366,22 @@
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0x30d2a9f5fdf90ace8c17952cbb4ee48a55d916a7",
-        "symbol": "WETH",
-        "name": "Wrapped Ether",
+        "symbol": "WETH.mad",
+        "name": "Wrapped Ether (Nomad)",
         "decimals": 18
     },
     {
         "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0xab3f0245b83feb11d15aaffefd7ad465a59817ed",
-        "symbol": "WETH",
-        "name": "Wrapped Ether",
+        "symbol": "WETH.wh",
+        "name": "Wrapped Ether (Wormhole)",
         "decimals": 18
     },
     {
         "chain": "astar",
         "token_name_encoded": "erc20,addr=0x81ecac0d6be0550a00ff064a4f9dd2400585fe9c",
-        "symbol": "WETH",
-        "name": "Wrapped Ether",
+        "symbol": "WETH.ce",
+        "name": "Wrapped Ether (Celer)",
         "decimals": 18
     },
     {
@@ -409,7 +409,7 @@
         "chain": "moonbeam",
         "token_name_encoded": "xc20,id=311091173110107856861649819128533077277",
         "symbol": "xcUSDT",
-        "name": "Tether USD",
+        "name": "Tether USD (Polkadot-Native)",
         "decimals": 6
     },
     {

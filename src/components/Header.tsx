@@ -7,9 +7,9 @@ import {
   VStack,
   HStack,
   useDisclosure,
-  Button,
   Switch,
-  useColorModeValue,
+  Spacer,
+  useMediaQuery,
 } from "@chakra-ui/react";
 
 import logo from "../assets/logo.svg";
@@ -25,44 +25,65 @@ export default function Layout({ children }: Props) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { colorMode, toggleColorMode } = useColorMode();
   const [isDarkMode, setIsDarkMode] = useState(colorMode === "dark");
+  const [isScreenFullWidth] = useMediaQuery("(min-width: 435px)");
+  const [isScreenMediumWidth] = useMediaQuery("(min-width: 400px)");
+  const [isScreenSmallWidth] = useMediaQuery("(min-width: 380px)");
+
+  function getFontSize() {
+    return isScreenFullWidth ? "md" : "sm";
+  }
+
+  function getIconStyle() {
+    return isScreenFullWidth
+      ? { height: 35, width: 35 }
+      : { height: 30, width: 30 };
+  }
+
+  function getLogoSize() {
+    if (isScreenFullWidth) {
+      return "8rem";
+    } else if (isScreenMediumWidth) {
+      return "7rem";
+    } else if (isScreenSmallWidth) {
+      return "6rem";
+    }
+    return "5rem";
+  }
 
   useEffect(() => setIsDarkMode(colorMode === "dark"), [colorMode]);
 
   return (
     <Menu>
-      <Flex
-        alignItems="center"
-        justifyContent="space-between"
-        // maxW="83.43rem"
-        mx="1.5rem"
-        mt="1.5rem"
-      >
-        <Image boxSize="8rem" src={logo} alt="PrivaDEX" />
+      <Flex alignItems="center" mx="1.5rem" mt="1.5rem">
+        <Image boxSize={getLogoSize()} src={logo} alt="PrivaDEX" />
+        <Spacer />
         <VStack spacing={4}>
           <Switch
             colorScheme="purple"
             onChange={toggleColorMode}
             isChecked={isDarkMode}
-            alignItems="right"
+            fontSize={getFontSize()}
+            fontWeight="500"
+            color={isDarkMode ? "white" : "black"}
           >
             Switch to {isDarkMode ? "light" : "dark"} mode
           </Switch>
-          <ConnectButton handleOpenModal={onOpen} />
+          <ConnectButton handleOpenModal={onOpen} fontSize={getFontSize()} />
           <HStack spacing={3}>
             <SocialIcon
               url="https://discord.gg/dpPDNreeQ3"
               target="_blank"
-              style={{ height: 35, width: 35 }}
+              style={getIconStyle()}
             />
             <SocialIcon
               url="https://twitter.com/doprivadex"
               target="_blank"
-              style={{ height: 35, width: 35 }}
+              style={getIconStyle()}
             />
             <SocialIcon
               url="https://www.youtube.com/@privadex"
               target="_blank"
-              style={{ height: 35, width: 35 }}
+              style={getIconStyle()}
             />
             <SocialIcon
               url="https://github.com/kapilsinha/privadex"
@@ -70,7 +91,7 @@ export default function Layout({ children }: Props) {
               fgColor="white"
               bgColor="black"
               // bgColor={useColorModeValue("black", "rgb(110,110,110)")}
-              style={{ height: 35, width: 35 }}
+              style={getIconStyle()}
             />
           </HStack>
         </VStack>

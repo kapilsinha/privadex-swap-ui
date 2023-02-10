@@ -1,8 +1,4 @@
-import {
-  ChakraProvider,
-  Flex,
-  useMediaQuery,
-} from "@chakra-ui/react";
+import { ChakraProvider, Flex, useMediaQuery } from "@chakra-ui/react";
 import theme from "./theme";
 import Header from "./components/Header";
 import Swap from "./components/Swap";
@@ -17,14 +13,14 @@ function App() {
 
   return (
     <ChakraProvider theme={theme}>
-      <Header/>
+      <Header />
       <Swap />
       {isScreenWideEnough ? (
         <Flex px="5" position={"absolute"} left="0rem" bottom="2rem">
           <FeedbackForm nrows={5} />
         </Flex>
       ) : (
-        <Flex px="5" left="0rem" bottom="2rem" justifyContent="center">
+        <Flex bottom="2rem" justifyContent="center">
           <FeedbackForm nrows={3} />
         </Flex>
       )}

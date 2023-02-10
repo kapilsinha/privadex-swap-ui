@@ -1,5 +1,5 @@
 import { useState } from "react";
-import {Button, Box, Image, useDisclosure, RadioGroup, Stack, Radio} from "@chakra-ui/react";
+import {Button, Box, Image, useDisclosure, RadioGroup, Stack, Radio, Text} from "@chakra-ui/react";
 import {ChevronDownIcon} from "@chakra-ui/icons";
 import astarLogo from "../assets/astar.webp";
 import moonbeamLogo from "../assets/moonbeam.png";
@@ -9,9 +9,10 @@ type Props = {
   setChain: any;
   // image: string;
   disabled: boolean;
+  fontSize: string;
 };
 
-export default function ChainSelect({chain, setChain, disabled}: Props) {
+export default function ChainSelect({chain, setChain, disabled, fontSize}: Props) {
     return (
       <RadioGroup pb={"1rem"} onChange={(newChain: string) => setChain(newChain)} value={chain}>
         <Stack direction='row'>
@@ -21,7 +22,7 @@ export default function ChainSelect({chain, setChain, disabled}: Props) {
              alt="Logo"
              mr="0.5rem"
             />
-            Moonbeam
+            <Text fontSize={fontSize}>Moonbeam</Text>
             </Radio>
           <Radio value='astar' isDisabled={disabled}>
           <Image boxSize="1.5rem"
@@ -29,7 +30,7 @@ export default function ChainSelect({chain, setChain, disabled}: Props) {
              alt="Logo"
              mr="0.5rem"
             />
-            Astar
+            <Text fontSize={fontSize}>Astar</Text>
             </Radio>
         </Stack>
       </RadioGroup>

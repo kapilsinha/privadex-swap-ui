@@ -11,6 +11,7 @@ import {
   Input,
   Link,
   useColorMode,
+  useMediaQuery,
 } from "@chakra-ui/react";
 // Can use later to make the table pretty but requires more work
 // import ReactTable from "react-table";
@@ -39,6 +40,7 @@ export default function TokenModal({
   // console.log(crypto);
   const [search, setSearch] = useState<any>("");
   const { colorMode } = useColorMode();
+  const [isScreenFullWidth] = useMediaQuery("(min-width: 500px)");
 
 
   function getChainExplorerLink(token_addr: string) {
@@ -53,6 +55,10 @@ export default function TokenModal({
     return ""; // Should never reach here
   }
 
+  function getTableStyle() {
+    return isScreenFullWidth ? { width: "460px", height: "350px", overflow: "scroll", display: "block" } : { width: "calc(92vw)", height: "350px", overflow: "scroll", display: "block" }
+  }
+
   // Used to reset the search text. Otherwise between close and open, the search
   // text remains set (but is invisible)
   // Can later dynamically pull tokens, but we do it statically for now
@@ -60,7 +66,7 @@ export default function TokenModal({
     setSearch("");
   }, [isOpen]);
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCentered size="lg">
+    <Modal isOpen={isOpen} onClose={onClose} isCentered>
       <ModalOverlay />
       <ModalContent
         background={colorMode === "dark" ? "black" : "white"}
@@ -68,6 +74,7 @@ export default function TokenModal({
         borderStyle="solid"
         borderColor="gray.300"
         borderRadius="3xl"
+        maxW={isScreenFullWidth ? "480px" : "calc(96vw)"}
       >
         <ModalHeader color={colorMode === "dark" ? "white" : "black"} px={4} fontSize="lg" fontWeight="medium">
           Select A Token
@@ -91,7 +98,7 @@ export default function TokenModal({
           >
             <Input
               placeholder="Search token name / symbol / address"
-              fontSize="1.5rem"
+              fontSize={isScreenFullWidth ? "1.5rem" : "0.95rem"}
               width="100%"
               size="19rem"
               textAlign="left"
@@ -111,13 +118,13 @@ export default function TokenModal({
           {/*</Box>*/}
           <div id="tokenlist" className="App">
             <table
-              style={{ height: "350px", overflow: "scroll", display: "block" }}
+              style={getTableStyle()}
             >
               <thead>
                 <tr>
                   <td align="center">Name</td>
                   <td align="center">Symbol</td>
-                  <td align="center">Address</td>
+                  <td align="left">Address</td>
                 </tr>
               </thead>
               <tbody>
