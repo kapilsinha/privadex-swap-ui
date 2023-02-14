@@ -407,13 +407,6 @@
     },
     {
         "chain": "moonbeam",
-        "token_name_encoded": "xc20,id=311091173110107856861649819128533077277",
-        "symbol": "xcUSDT",
-        "name": "Tether USD (Polkadot-Native)",
-        "decimals": 6
-    },
-    {
-        "chain": "moonbeam",
         "token_name_encoded": "erc20,addr=0xffffffff52c56a9257bb97f4b2b6f7b2d624ecda",
         "symbol": "xcaUSD",
         "name": "Acala Dollar",
