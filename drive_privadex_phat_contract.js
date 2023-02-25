@@ -120,22 +120,14 @@ class PrivaDexAPI {
   }
 
   async execPlanStepForward(execPlanId) {
-    try {
-      const res = await this.#contractApi.query.executionPlanStepForward(
-        this.#certSudo,
-        {},
-        execPlanId.replace("0x", "")
-      );
-      const printableRes = res.output.isOk ? res.output.asOk : res.output.asErr;
-      logger.info(`Step forward result for ${execPlanId}: ${printableRes}`);
-      return res;
-    }
-    catch {
-      // This error happens sometimes on Error, potentially due to a type version mismatch:
-      // createType(Result<Option<u128>, PrivadexExecutorPrivadexPhatError>):: Result<Option<u128>,PrivadexExecutorPrivadexPhatError>:: Decoded input doesn't match input, received 0x01110c (3 bytes), created 0x0111 (2 bytes)
-      logger.error("Unknown error - likely createType/decode error");
-      return "UnknownMaybeDecodeError";
-    }
+    const res = await this.#contractApi.query.executionPlanStepForward(
+      this.#certSudo,
+      {},
+      execPlanId.replace("0x", "")
+    );
+    const printableRes = res.output.isOk ? res.output.asOk : res.output.asErr;
+    logger.info(`Step forward result for ${execPlanId}: ${printableRes}`);
+    return res;
   }
 }
 
