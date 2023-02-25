@@ -270,7 +270,7 @@ export default function Trade() {
       // fee estimate in useDapp fails). I'm hard-coding 65,000 across the board
       // as a generous overestimate
       receipt = await send(escrowAddress, amountIn, {
-        gasLimit: BigNumber.from(65000),
+        gasLimit: BigNumber.from(200000),
       });
     }
     console.log("User to escrow transaction receipt =", receipt);
