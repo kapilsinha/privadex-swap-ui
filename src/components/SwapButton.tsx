@@ -1,4 +1,4 @@
-import { Button, Box } from "@chakra-ui/react";
+import { Button, Box, useToast } from "@chakra-ui/react";
 import { Astar, Moonbeam, useConnector, useEthers } from "@usedapp/core";
 import { Token } from "../data_models/Token";
 import { priva_grayed_lavender, priva_lavender, priva_turquoise } from "../theme";
@@ -25,6 +25,7 @@ export default function SwapButton({
   const { account, chainId, switchNetwork, activateBrowserWallet, error } =
     useEthers();
   const { connector, isLoading } = useConnector();
+  const toast = useToast();
 
   function funcIsCorrectChainId() {
     // Should make Chain not a string later so I don't have to do this if-else logic here
@@ -53,6 +54,14 @@ export default function SwapButton({
       <Box mt="0.5rem">
         <Button
           onClick={() => {
+            toast({
+              title: "Don't exit this app tab/window yet!",
+              description: `Please feel free to exit the application after you get a pop-up saying 'Swap in progress' (takes just a few seconds). But we will show your swap status updates if you stay on :).`,
+              status: "info",
+              duration: 16000,
+              isClosable: true,
+              position: "bottom",
+            });
             startSwap();
           }}
           color="white"
