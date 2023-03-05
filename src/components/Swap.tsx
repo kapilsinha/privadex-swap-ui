@@ -68,7 +68,7 @@ export default function Trade() {
   const [destToken, setDestToken] = useState<Token | null>(null);
   const [srcChain, setSrcChain] = useState<string>("moonbeam"); // arbitrarily selected one of the chains
   const [destChain, setDestChain] = useState<string>("astar");
-  const [disabled, setDisabled] = useState<boolean>(false);
+  const [disabled, setDisabled] = useState<boolean>(true);
 
   const [srcQuantity, setSrcQuantity] = useState<BigInt>(BigInt(0));
   const readableSrcQuantity =
@@ -281,6 +281,7 @@ export default function Trade() {
     async function initializePrivaDexApi() {
       privadexApi.current = await PrivaDexAPI.initialize();
       console.log("PrivaDEX API initialized:", privadexApi.current);
+      setDisabled(false);
     }
     initializePrivaDexApi();
   }, []);
