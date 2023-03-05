@@ -89,6 +89,7 @@ export class PrivaDexAPI {
         ...typeDefinitions.contracts.types,
       },
     });
+    console.log("Phat API:", api)
 
     // Prepare accounts
     const keyring = new Keyring({ type: "sr25519" });

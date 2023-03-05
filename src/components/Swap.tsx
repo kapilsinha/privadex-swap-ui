@@ -280,6 +280,7 @@ export default function Trade() {
   useEffect(() => {
     async function initializePrivaDexApi() {
       privadexApi.current = await PrivaDexAPI.initialize();
+      console.log("PrivaDEX API initialized:", privadexApi.current);
     }
     initializePrivaDexApi();
   }, []);
