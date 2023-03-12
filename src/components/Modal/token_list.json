@@ -260,13 +260,6 @@
     },
     {
         "chain": "astar",
-        "token_name_encoded": "erc20,addr=0x6df98e5fbff3041105cb986b9d44c572a43fcd22",
-        "symbol": "NIKA",
-        "name": "Nika",
-        "decimals": 18
-    },
-    {
-        "chain": "astar",
         "token_name_encoded": "erc20,addr=0x29f6e49c6e3397c3a84f715885f9f233a441165c",
         "symbol": "oUSD",
         "name": "oUSD",
